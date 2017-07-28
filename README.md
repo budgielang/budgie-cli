@@ -10,7 +10,7 @@ Node CLI for [General Language Syntax (GLS)](https://github.com/HighSchoolHackin
 To convert `file.gls` to `file.py`:
 
 ```cmd
-npm install gls-cli
+npm install gls-cli --global
 
 gls-cli --language Python file.gls
 ```

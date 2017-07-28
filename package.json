@@ -4,7 +4,7 @@
   "description": "Node CLI for General Language Syntax (GLS).",
   "main": "lib/index.js",
   "bin": {
-    "gls": "bin/gls"
+    "gls-cli": "bin/gls-cli"
   },
   "scripts": {
     "test": "gulp test"

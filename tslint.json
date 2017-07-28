@@ -1,0 +1,7 @@
+{
+    "extends": ["tslint:all"],
+    "rules": {
+        "linebreak-style": [false],
+        "no-import-side-effect": [false]
+    }
+}

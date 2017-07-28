@@ -1,0 +1,55 @@
+{
+  "name": "gls-cli",
+  "version": "0.1.0",
+  "description": "Node CLI for General Language Syntax (GLS).",
+  "main": "lib/index.js",
+  "bin": {
+    "gls": "bin/gls"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/highschoolhacking/gls-cli.git"
+  },
+  "keywords": [
+    "general",
+    "language",
+    "syntax",
+    "gls",
+    "cli"
+  ],
+  "author": "Josh Goldberg <joshuakgoldberg@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/highschoolhacking/gls-cli/issues"
+  },
+  "homepage": "https://github.com/highschoolhacking/gls-cli#readme",
+  "dependencies": {
+    "chalk": "^2.0.1",
+    "commander": "^2.11.0",
+    "general-language-syntax": "^0.3.16",
+    "glob": "^7.1.2",
+    "minimatch": "^3.0.4"
+  },
+  "devDependencies": {
+    "@types/chai": "^3.5.2",
+    "@types/minimatch": "^2.0.29",
+    "@types/mocha": "^2.2.41",
+    "@types/node": "^7.0.18",
+    "chai": "^3.5.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^4.3.1",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-tslint": "^8.0.0",
+    "gulp-typescript": "^3.1.6",
+    "gulp-uglify": "^2.1.2",
+    "merge2": "^1.0.3",
+    "mocha": "^3.4.1",
+    "run-sequence": "^1.2.2",
+    "tslint": "^5.2.0",
+    "typescript": "^2.3.2"
+  }
+}

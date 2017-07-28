@@ -18,7 +18,6 @@
         "../src/**/*.ts"
     ],
     "include": [
-        "./unit/**/*.ts",
-        "./end-to-end/*.ts"
+        "./*.ts"
     ]
 }

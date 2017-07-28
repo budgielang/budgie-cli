@@ -2,6 +2,9 @@
     "extends": ["tslint:all"],
     "rules": {
         "linebreak-style": [false],
-        "no-import-side-effect": [false]
+        "newline-before-return": [false],
+        "no-import-side-effect": [false],
+        "prefer-function-over-method": [false],
+        "typedef": [false]
     }
 }

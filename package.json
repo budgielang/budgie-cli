@@ -31,13 +31,16 @@
     "commander": "^2.11.0",
     "general-language-syntax": "^0.3.16",
     "glob": "^7.1.2",
-    "minimatch": "^3.0.4"
+    "minimatch": "^3.0.4",
+    "mz": "^2.6.0"
   },
   "devDependencies": {
     "@types/chai": "^3.5.2",
     "@types/minimatch": "^2.0.29",
     "@types/mocha": "^2.2.41",
+    "@types/mz": "0.0.31",
     "@types/node": "^7.0.18",
+    "@types/sinon": "^2.3.3",
     "chai": "^3.5.0",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
@@ -49,6 +52,7 @@
     "merge2": "^1.0.3",
     "mocha": "^3.4.1",
     "run-sequence": "^1.2.2",
+    "sinon": "^2.4.1",
     "tslint": "^5.2.0",
     "typescript": "^2.3.2"
   }

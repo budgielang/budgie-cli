@@ -1,10 +1,10 @@
 {
   "name": "gls-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node CLI for General Language Syntax (GLS).",
   "main": "lib/index.js",
   "bin": {
-    "gls-cli": "bin/gls-cli"
+    "gls": "bin/gls"
   },
   "scripts": {
     "test": "gulp test"

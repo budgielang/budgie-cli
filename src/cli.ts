@@ -6,8 +6,16 @@ import { printCliVersions } from "./version";
 
 const cli = async (logger: ILogger) => {
     const command = program
+        .usage("[options] <file ...> --language [language]")
         .option("-l, --language [language]", "language to convert to")
         .option("-v, --version", "output the CLI and GLS version numbers")
+        .on("--help", (): void => {
+            logger.log();
+            logger.log("  Example:");
+            logger.log();
+            logger.log("    $ gls --language Python file.gls");
+            logger.log();
+        })
         .parse(process.argv);
 
     if (command.hasOwnProperty("version")) {

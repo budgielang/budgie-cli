@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "declaration": false,
-        "lib": ["dom", "es5", "es2015.collection", "es2015.iterable"],
+        "lib": ["es5", "es2015.collection", "es2015.iterable", "es2015.promise"],
         "module": "commonjs",
         "moduleResolution": "node",
         "target": "es5",
@@ -18,6 +18,6 @@
         "../src/**/*.ts"
     ],
     "include": [
-        "./*.ts"
+        "./**/*.ts"
     ]
 }

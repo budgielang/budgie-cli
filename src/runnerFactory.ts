@@ -1,25 +1,19 @@
 import { Language } from "general-language-syntax";
 
-import { Converter } from "./converter";
-import { FileSystem } from "./files";
+import { createCoordinator } from "./coordinatorFactory";
+import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
 import { Runner } from "./runner";
 
 export interface ICreateRunnerDependencies {
+    fileSystem: IFileSystem;
     language: Language;
     logger: ILogger;
 }
 
-export const createRunner = (dependencies: ICreateRunnerDependencies) => {
-    const fileSystem = new FileSystem();
-
-    return new Runner({
-        converter: new Converter({
-            fileSystem,
-            language: dependencies.language,
-            logger: console,
-        }),
-        fileSystem,
-        logger: console,
+export const createRunner = (dependencies: ICreateRunnerDependencies) =>
+    new Runner({
+        coordinator: createCoordinator(dependencies),
+        fileSystem: dependencies.fileSystem,
+        logger: dependencies.logger,
     });
-};

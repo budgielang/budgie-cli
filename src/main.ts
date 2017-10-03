@@ -1,6 +1,7 @@
 import * as chalk from "chalk";
 import { Language, LanguagesBag } from "general-language-syntax";
 
+import { FileSystem } from "./files";
 import { ILogger } from "./logger";
 import { createRunner } from "./runnerFactory";
 
@@ -20,6 +21,9 @@ export interface IMainDependencies {
      */
     languageName?: string;
 
+    /**
+     * Logs information on significant events.
+     */
     logger: ILogger;
 }
 
@@ -48,7 +52,7 @@ export const main = async (dependencies: IMainDependencies): Promise<number> => 
             return undefined;
         }
 
-        return languagesBag.getLanguage(languageName);
+        return languagesBag.getLanguageByName(languageName);
     };
 
     const run = async (): Promise<number> => {
@@ -58,6 +62,7 @@ export const main = async (dependencies: IMainDependencies): Promise<number> => 
         }
 
         const runner = createRunner({
+            fileSystem: new FileSystem(),
             language,
             logger: dependencies.logger,
         });

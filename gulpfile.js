@@ -37,7 +37,11 @@ gulp.task("src:tslint", function () {
 
     return gulp
         .src("src/**/*.ts")
-        .pipe(gulpTslint({ program }));
+        .pipe(gulpTslint({
+            formatter: "stylish",
+            program
+        }))
+        .pipe(gulpTslint.report());
 });
 
 gulp.task("src:tsc", function () {
@@ -75,9 +79,13 @@ gulp.task("test:tslint", function () {
 
     return gulp
         .src([
-            "./test/*.ts"
+            "./test/**/*.ts"
         ])
-        .pipe(gulpTslint({ program }));
+        .pipe(gulpTslint({
+            formatter: "stylish",
+            program
+        }))
+        .pipe(gulpTslint.report());
 });
 
 gulp.task("test:tsc", function () {

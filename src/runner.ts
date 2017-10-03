@@ -1,56 +1,124 @@
 import * as chalk from "chalk";
-import { EOL } from "os";
 
-import { ConversionStatus, IConverter } from "./converter";
+import { ConversionStatus, IConversionResult } from "./converter";
+import { Coordinator } from "./coordinator";
 import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
 
-export interface IOptions {
+/**
+ * Options to convert a set of files.
+ */
+export interface IRunOptions {
+    /**
+     * Files to convert.
+     */
     files: string[];
 }
 
+/**
+ * Conversion results for a set of files, keyed by file path.
+ */
+export interface IFileResults {
+    [i: string]: IConversionResult;
+}
+
+/**
+ * Results from converting a set of files.
+ */
+export interface IRunResults {
+    /**
+     * Conversion results for the files, keyed by file path.
+     */
+    fileResults: IFileResults;
+}
+
+/**
+ * Dependencies to initialize an instance of the Runner class.
+ */
 export interface IRunnerDependencies {
-    converter: IConverter;
+    /**
+     * Coordinates converting files to their language outputs.
+     */
+    coordinator: Coordinator;
+
+    /**
+     * Reads and writes files.
+     */
     fileSystem: IFileSystem;
+
+    /**
+     * Logs information on significant events.
+     */
     logger: ILogger;
 }
 
+/**
+ * Persistent runner for converting files.
+ */
 export class Runner {
+    /**
+     * Dependencies used for initialization.
+     */
     private readonly dependencies: IRunnerDependencies;
 
+    /**
+     * Initializes a new instance of the Runner class.
+     *
+     * @param dependencies   Dependencies to be used for initialization.
+     */
     public constructor(dependencies: IRunnerDependencies) {
         this.dependencies = dependencies;
     }
 
-    public async run(options: IOptions) {
-        const results = await Promise.all(
-            options.files.map(
-                (fileName) => this.runOnFile(fileName)));
+    /**
+     * Converts a set of files.
+     *
+     * @param options   Options for converting files.
+     * @returns A Promise for converting the files.
+     */
+    public async run(options: IRunOptions): Promise<IRunResults> {
+        const promises: Promise<void>[] = [];
+        const fileResults: IFileResults = {};
+
+        for (const fileName of options.files) {
+            promises.push(
+                this.runOnFile(fileName, options)
+                    .then((result: IConversionResult) => {
+                        fileResults[fileName] = result;
+                    }));
+        }
+
+        await Promise.all(promises);
+        return { fileResults };
     }
 
-    private runOnFile = async (filePath: string) => {
+    /**
+     * Converts a file.
+     *
+     * @param filePath   Path to the file.
+     * @param options   Options for converting files.
+     * @returns A Promise for converting the file.
+     */
+    private runOnFile = async (filePath: string, options: IRunOptions) => {
         this.dependencies.logger.log(
             chalk.grey("Converting"),
             `${filePath}${chalk.grey("...")}`);
 
-        const result = await this.dependencies.converter.convertFile(filePath);
+        const result = await this.dependencies.coordinator.convertFile(filePath);
 
         if (result.status === ConversionStatus.Failed) {
             this.dependencies.logger.error(
                 chalk.italic.red("Failed converting"),
-                chalk.red.bold(filePath),
+                `${chalk.red.bold(filePath)}:`,
                 chalk.red(result.error.message));
-            return;
+        } else {
+            this.dependencies.logger.log(
+                chalk.italic("Converted"),
+                chalk.bold(filePath),
+                chalk.italic("to"),
+                chalk.bold.green(result.outputPath));
         }
 
-        const outputPath = this.dependencies.converter.convertFilePath(filePath);
-
-        this.dependencies.fileSystem.writeFile(outputPath, result.lines.join(EOL));
-
-        this.dependencies.logger.error(
-            chalk.italic("Converted"),
-            chalk.bold(filePath),
-            chalk.italic("to"),
-            chalk.bold.green(outputPath));
+        return result;
     }
 }

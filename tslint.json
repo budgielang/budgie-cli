@@ -1,9 +1,11 @@
 {
     "extends": ["tslint:all"],
     "rules": {
+        "array-type": [true, "array"],
         "linebreak-style": [false],
         "newline-before-return": [false],
         "no-import-side-effect": [false],
+        "no-unsafe-any": [false],
         "prefer-function-over-method": [false],
         "typedef": [false]
     }

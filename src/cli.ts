@@ -4,6 +4,12 @@ import { ILogger } from "./logger";
 import { main } from "./main";
 import { printCliVersions } from "./version";
 
+interface ICliProgram {
+    args: string[];
+    language?: string;
+    help(): void;
+}
+
 const cli = async (logger: ILogger) => {
     const command = program
         .usage("[options] <file ...> --language [language]")
@@ -16,23 +22,21 @@ const cli = async (logger: ILogger) => {
             logger.log("    $ gls --language Python file.gls");
             logger.log();
         })
-        .parse(process.argv);
+        .parse(process.argv) as ICliProgram;
 
     if (command.hasOwnProperty("version")) {
         await printCliVersions(logger);
         return;
     }
 
-    const files = program.args as string[];
-
-    if (files.length === 0) {
+    if (command.args.length === 0) {
         command.help();
         return;
     }
 
     const exitCode = await main({
-        files,
-        languageName: program.language as string,
+        files: command.args,
+        languageName: command.language as string,
         logger: console,
     });
 

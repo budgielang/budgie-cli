@@ -27,37 +27,38 @@
   },
   "homepage": "https://github.com/highschoolhacking/gls-cli#readme",
   "dependencies": {
-    "@types/commander": "^2.9.1",
-    "chalk": "^2.0.1",
+    "@types/commander": "^2.11.0",
+    "chalk": "^2.1.0",
     "commander": "^2.11.0",
-    "general-language-syntax": "^0.3.16",
+    "general-language-syntax": "^0.3.20",
     "glob": "^7.1.2",
     "minimatch": "^3.0.4",
-    "mz": "^2.6.0"
+    "mz": "^2.7.0",
+    "ts-gls": "^0.1.2"
   },
   "devDependencies": {
-    "@types/chai": "^3.5.2",
-    "@types/minimatch": "^2.0.29",
-    "@types/mocha": "^2.2.41",
-    "@types/mz": "0.0.31",
-    "@types/node": "^7.0.18",
-    "@types/sinon": "^2.3.3",
-    "chai": "^3.5.0",
-    "del": "^2.2.2",
+    "@types/chai": "^4.0.4",
+    "@types/minimatch": "^3.0.1",
+    "@types/mocha": "^2.2.43",
+    "@types/mz": "0.0.32",
+    "@types/node": "^8.0.32",
+    "@types/sinon": "^2.3.5",
+    "chai": "^4.1.2",
+    "del": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-mocha": "^4.3.1",
-    "gulp-sourcemaps": "^2.6.0",
-    "gulp-tslint": "^8.0.0",
-    "gulp-typescript": "^3.1.6",
-    "gulp-uglify": "^2.1.2",
-    "merge2": "^1.0.3",
-    "mocha": "^3.4.1",
-    "run-sequence": "^1.2.2",
-    "sinon": "^2.4.1",
-    "tslint": "^5.2.0",
-    "typescript": "^2.3.2"
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-tslint": "^8.1.2",
+    "gulp-typescript": "^3.2.2",
+    "gulp-uglify": "^3.0.0",
+    "merge2": "^1.2.0",
+    "mocha": "^4.0.0",
+    "run-sequence": "^2.2.0",
+    "sinon": "^4.0.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.3"
   },
   "peerDependencies": {
-    "general-language-syntax": "^0.3.16"
+    "general-language-syntax": "^0.3.20"
   }
 }

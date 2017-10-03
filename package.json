@@ -34,7 +34,7 @@
     "glob": "^7.1.2",
     "minimatch": "^3.0.4",
     "mz": "^2.7.0",
-    "ts-gls": "^0.1.2"
+    "ts-gls": "^0.1.3"
   },
   "devDependencies": {
     "@types/chai": "^4.0.4",

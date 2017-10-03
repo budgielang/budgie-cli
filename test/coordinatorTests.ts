@@ -4,7 +4,6 @@ import "mocha";
 import { EOL } from "os";
 
 import { ConversionStatus } from "../lib/converter";
-import { Coordinator } from "../lib/coordinator";
 import { createCoordinator } from "../lib/coordinatorFactory";
 import { IMockFiles, mockFileSystem } from "./mocks/fileSystem";
 import { stubLogger } from "./stubs";

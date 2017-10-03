@@ -5,6 +5,7 @@
         "linebreak-style": [false],
         "newline-before-return": [false],
         "no-import-side-effect": [false],
+        "no-submodule-imports": [false],
         "no-unsafe-any": [false],
         "prefer-function-over-method": [false],
         "typedef": [false]

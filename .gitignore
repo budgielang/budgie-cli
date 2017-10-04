@@ -2,5 +2,4 @@ dist
 lib
 node_modules/
 npm-debug.log
-test/*.js
-test/end-to-end/*.ts
+test/**/*.js

@@ -1,9 +1,11 @@
 import * as chalk from "chalk";
+import { EOL } from "os";
 
 import { ConversionStatus, IConversionResult } from "./converter";
 import { Coordinator } from "./coordinator";
 import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
+import { indent } from "./utils/text";
 
 /**
  * Options to convert a set of files.
@@ -108,9 +110,13 @@ export class Runner {
 
         if (result.status === ConversionStatus.Failed) {
             this.dependencies.logger.error(
-                chalk.italic.red("Failed converting"),
-                `${chalk.red.bold(filePath)}:`,
-                chalk.red(result.error.message));
+                chalk.grey.italic("Failed converting"),
+                [
+                    chalk.red.bold(filePath),
+                    chalk.grey.italic(":"),
+                    EOL,
+                    indent(chalk.italic.red(result.error.message)),
+                ].join(""));
         } else {
             this.dependencies.logger.log(
                 chalk.italic("Converted"),

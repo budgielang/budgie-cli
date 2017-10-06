@@ -1,7 +1,7 @@
 import { ConversionStatus, IConversionResult, IConverter } from "./converter";
 import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
-import { getFileExtension } from "./utils";
+import { getFileExtension } from "./utils/extensions";
 
 /**
  * Dependencies to initialize a new instance of the Converter class.

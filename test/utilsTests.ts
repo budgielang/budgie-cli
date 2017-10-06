@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import "mocha";
 
-import { getFileExtension, replaceFileExtension } from "../lib/utils";
+import { getFileExtension, replaceFileExtension } from "../lib/utils/extensions";
 
 describe("utils", () => {
     describe("getFileExtension", () => {

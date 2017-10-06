@@ -2,6 +2,7 @@ import * as program from "commander";
 
 import { ILogger } from "./logger";
 import { main } from "./main";
+import { globAllAsync } from "./utils/glob";
 import { printCliVersions } from "./version";
 
 interface ICliProgram {
@@ -34,8 +35,10 @@ const cli = async (logger: ILogger) => {
         return;
     }
 
+    const files = await globAllAsync(command.args);
+
     const exitCode = await main({
-        files: command.args,
+        files,
         languageName: command.language as string,
         logger: console,
     });

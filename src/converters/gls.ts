@@ -3,7 +3,7 @@ import { EOL } from "os";
 
 import { ConversionStatus, IConversionResult, IConverter } from "../converter";
 import { IFileSystem } from "../files";
-import { replaceFileExtension } from "../utils";
+import { replaceFileExtension } from "../utils/extensions";
 
 /**
  * Dependencies to initialize a new instance of the GlsConverter class.

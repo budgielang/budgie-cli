@@ -39,6 +39,7 @@
   "devDependencies": {
     "@types/chai": "^4.0.4",
     "@types/chalk": "^0.4.31",
+    "@types/glob": "^5.0.32",
     "@types/minimatch": "^3.0.1",
     "@types/mocha": "^2.2.43",
     "@types/mz": "0.0.32",

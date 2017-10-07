@@ -3,7 +3,7 @@ import { createTransformer, UnsupportedComplaint } from "ts-gls";
 
 import { ConversionStatus, IConversionResult, IConverter } from "../converter";
 import { IFileSystem } from "../files";
-import { replaceFileExtension } from "../utils";
+import { replaceFileExtension } from "../utils/extensions";
 import { glsExtension } from "./gls";
 
 /**

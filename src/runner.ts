@@ -5,6 +5,7 @@ import { ConversionStatus, IConversionResult } from "./converter";
 import { Coordinator } from "./coordinator";
 import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
+import { queueAsyncActions } from "./utils/asyncQueue";
 import { indent } from "./utils/text";
 
 /**
@@ -84,22 +85,23 @@ export class Runner {
      * @returns A Promise for converting the files.
      */
     public async run(options: IRunOptions): Promise<IRunResults> {
-        const promises: Promise<void>[] = [];
         const fileResults: IFileResults = {};
 
-        options.files.forEach((fileName: string) => {
-            promises.push(
-                this.runOnFile(fileName, options)
-                    .then((result: IConversionResult) => {
-                        fileResults[fileName] = result;
-                    }));
-        });
+        await queueAsyncActions(
+            Array.from(options.files)
+                .map((fileName: string) =>
+                    async () => {
+                        await this.runOnFile(fileName, options)
+                            .then((result: IConversionResult) => {
+                                fileResults[fileName] = result;
+                            });
+                        }));
 
-        await Promise.all(promises);
         this.dependencies.logger.log(
             chalk.italic("Ran on"),
             chalk.bold(`${options.files.size}`),
             chalk.italic(`file${options.files.size === 1 ? "s" : ""}.`));
+
         return { fileResults };
     }
 

@@ -1,12 +1,9 @@
-import { expect, use } from "chai";
+import { expect } from "chai";
 import "mocha";
-import * as sinonChai from "sinon-chai";
 
 import { cli } from "../lib/cli/cli";
 import { ExitCode, IMainDependencies } from "../lib/main";
 import { stubLogger } from "./stubs";
-
-use(sinonChai);
 
 interface IGlobExpansions {
     [i: string]: string[];

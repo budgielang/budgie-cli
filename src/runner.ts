@@ -98,8 +98,8 @@ export class Runner {
         await Promise.all(promises);
         this.dependencies.logger.log(
             chalk.italic("Ran on"),
-            options.files.length,
-            chalk.italic("files."));
+            chalk.bold(`${options.files.length}`),
+            chalk.italic(`file${options.files.length === 1 ? "s" : ""}.`));
         return { fileResults };
     }
 

@@ -1,6 +1,6 @@
 import { EOL } from "os";
 import { basename } from "path";
-import { createTransformer, UnsupportedComplaint } from "ts-gls";
+import { createTransformer, Transformer } from "ts-gls";
 import * as ts from "typescript";
 
 import { ConversionStatus, IConversionResult, IConverter } from "../../converter";
@@ -54,6 +54,11 @@ export class TypeScriptConverter implements IConverter {
     private readonly program: ts.Program;
 
     /**
+     * Transforms TypeScript to GLS.
+     */
+    private readonly transformer: Transformer;
+
+    /**
      * Initializes a new instance of the TypeScriptConverter class.
      *
      * @param dependencies   Dependencies used for initialization.
@@ -62,7 +67,12 @@ export class TypeScriptConverter implements IConverter {
     public constructor(dependencies: ITypeScriptConverterDependencies, options: IRunOptions) {
         this.dependencies = dependencies;
         this.options = options;
-        this.program = ts.createProgram(options.files, dependencies.compilerOptions);
+        this.transformer = createTransformer();
+        this.program = ts.createProgram(
+            options.files,
+            {
+                ...dependencies.compilerOptions,
+            });
     }
 
     /**
@@ -73,16 +83,18 @@ export class TypeScriptConverter implements IConverter {
      */
     public async convertFile(filePath: string): Promise<IConversionResult> {
         const fileContents = await this.dependencies.fileSystem.readFile(filePath);
-        const transformer = createTransformer();
         const scriptTarget = this.dependencies.compilerOptions.target === undefined
             ? defaultScriptTarget
             : this.dependencies.compilerOptions.target;
 
         const sourceFile = ts.createSourceFile(basename(filePath), fileContents, scriptTarget, true);
-        const converted = transformer.transformSourceFile(sourceFile);
-        if (converted instanceof UnsupportedComplaint) {
+        let converted: string[] | undefined;
+
+        try {
+            converted = this.transformer.transformSourceFile(sourceFile, this.program.getTypeChecker());
+        } catch (error) {
             return {
-                error: new Error(converted.toString()),
+                error,
                 status: ConversionStatus.Failed,
             };
         }

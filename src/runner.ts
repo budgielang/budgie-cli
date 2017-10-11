@@ -124,7 +124,7 @@ export class Runner {
                     chalk.red.bold(filePath),
                     chalk.grey.italic(":"),
                     EOL,
-                    indent(chalk.italic.red(result.error.message)),
+                    indent(chalk.italic.red(result.error.stack === undefined ? result.error.message : result.error.stack)),
                 ].join(""));
         } else {
             this.dependencies.logger.log(

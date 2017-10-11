@@ -15,12 +15,17 @@ const cli = async (logger: ILogger) => {
     const command = program
         .usage("[options] <file ...> --language [language]")
         .option("-l, --language [language]", "language to convert to")
+        .option("-t, --tsconfig", "(TypeScript only) configuration project")
         .option("-v, --version", "output the CLI and GLS version numbers")
         .on("--help", (): void => {
             logger.log();
-            logger.log("  Example:");
+            logger.log("  Basic GLS conversion:");
             logger.log();
             logger.log("    $ gls --language Python file.gls");
+            logger.log();
+            logger.log("  Converting a TypeScript project to GLS, then to Java:");
+            logger.log();
+            logger.log("    $ gls --language Java --tsconfig ./tsconfig ./src/*.ts");
             logger.log();
         })
         .parse(process.argv) as ICliProgram;

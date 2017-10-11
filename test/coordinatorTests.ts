@@ -5,6 +5,7 @@ import { EOL } from "os";
 
 import { ConversionStatus } from "../lib/converter";
 import { createCoordinator } from "../lib/coordinatorFactory";
+import { IRunOptions } from "../lib/runner";
 import { IMockFiles, mockFileSystem } from "./mocks/fileSystem";
 import { stubLogger } from "./stubs";
 
@@ -18,6 +19,13 @@ describe("Coordinator", () => {
         return { coordinator, fileSystem, language, logger };
     };
 
+    const stubTsconfigFileName = "tsconfig.json";
+
+    const stubOptions = (inputFilePath: string): IRunOptions => ({
+        files: [inputFilePath],
+        typescriptConfig: stubTsconfigFileName,
+    });
+
     describe("convertFile", () => {
         it("converts a GLS file to C#", async () => {
             // Arrange
@@ -27,17 +35,18 @@ describe("Coordinator", () => {
                 "C#",
                 {
                     [inputFilePath]: "comment line : Hello world!",
+                    [stubTsconfigFileName]: "{}",
                 });
 
             // Act
-            const result = await coordinator.convertFile(inputFilePath);
+            const result = await coordinator.convertFile(inputFilePath, stubOptions(inputFilePath));
 
             // Assert
-            expect(fileSystem.files[outputFilePath]).to.be.equal("// Hello world!");
             expect(result).to.be.deep.equal({
                 outputPath: outputFilePath,
                 status: ConversionStatus.Succeeded,
             });
+            expect(fileSystem.files[outputFilePath]).to.be.equal("// Hello world!");
         });
 
         it("converts a TypeScript file to C#", async () => {
@@ -48,21 +57,22 @@ describe("Coordinator", () => {
                 "C#",
                 {
                     [inputFilePath]: 'console.log("Hello world!");',
+                    [stubTsconfigFileName]: "{}",
                 });
 
             // Act
-            const result = await coordinator.convertFile(inputFilePath);
+            const result = await coordinator.convertFile(inputFilePath, stubOptions(inputFilePath));
 
             // Assert
+            expect(result).to.be.deep.equal({
+                outputPath: outputFilePath,
+                status: ConversionStatus.Succeeded,
+            });
             expect(fileSystem.files[outputFilePath]).to.be.equal([
                 "using System;",
                 "",
                 'Console.WriteLine("Hello world!");',
             ].join(EOL));
-            expect(result).to.be.deep.equal({
-                outputPath: outputFilePath,
-                status: ConversionStatus.Succeeded,
-            });
         });
     });
 });

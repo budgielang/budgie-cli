@@ -1,7 +1,7 @@
 import { Language } from "general-language-syntax";
 
 import { GlsConverter } from "./converters/gls";
-import { tsExtension, TypeScriptConverter } from "./converters/typescript";
+import { createTypeScriptConverter, tsExtension } from "./converters/typescript";
 import { Coordinator } from "./coordinator";
 import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
@@ -21,11 +21,6 @@ export const createCoordinator = (dependencies: ICreateCoordinatorDependencies) 
         fileSystem: dependencies.fileSystem,
         logger: console,
         preprocessors: new Map([
-            [
-                tsExtension,
-                new TypeScriptConverter({
-                    fileSystem: dependencies.fileSystem,
-                }),
-            ],
+            [tsExtension, createTypeScriptConverter],
         ]),
     });

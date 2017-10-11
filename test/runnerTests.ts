@@ -18,6 +18,8 @@ describe("Runner", () => {
         return { runner, fileSystem, language, logger };
     };
 
+    const stubTsconfigFileName = "tsconfig.json";
+
     describe("run", () => {
         it("converts a GLS file to C#", async () => {
             // Arrange
@@ -27,11 +29,13 @@ describe("Runner", () => {
                 "C#",
                 {
                     [inputFilePath]: "comment line : Hello world!",
+                    [stubTsconfigFileName]: "{}",
                 });
 
             // Act
             const results = await runner.run({
                 files: [inputFilePath],
+                typescriptConfig: stubTsconfigFileName,
             });
 
             // Assert
@@ -53,11 +57,13 @@ describe("Runner", () => {
                 "C#",
                 {
                     [inputFilePath]: 'console.log("Hello world!");',
+                    [stubTsconfigFileName]: "{}",
                 });
 
             // Act
             const results = await runner.run({
                 files: [inputFilePath],
+                typescriptConfig: stubTsconfigFileName,
             });
 
             // Assert

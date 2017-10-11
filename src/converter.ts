@@ -1,3 +1,6 @@
+import { IConverterDependencies } from "./coordinator";
+import { IRunOptions } from "./runner";
+
 /**
  * Status from a conversion attempt.
  */
@@ -60,3 +63,12 @@ export interface IConverter {
      */
     convertFile(filePath: string): Promise<IConversionResult>;
 }
+
+/**
+ * Asynchronously creates a converter.
+ *
+ * @param dependencies   Dependencies to create the converter.
+ * @param options   Options for converting files.
+ * @returns A Promise for a converter or error string.
+ */
+export type IConverterCreator = (dependencies: IConverterDependencies, options: IRunOptions) => Promise<IConverter | string>;

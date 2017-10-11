@@ -15,6 +15,11 @@ export interface IRunOptions {
      * Files to convert.
      */
     files: string[];
+
+    /**
+     * TypeScript configuration project, if provided.
+     */
+    typescriptConfig?: string;
 }
 
 /**
@@ -91,6 +96,10 @@ export class Runner {
         }
 
         await Promise.all(promises);
+        this.dependencies.logger.log(
+            chalk.italic("Ran on"),
+            options.files.length,
+            chalk.italic("files."));
         return { fileResults };
     }
 
@@ -106,7 +115,7 @@ export class Runner {
             chalk.grey("Converting"),
             `${filePath}${chalk.grey("...")}`);
 
-        const result = await this.dependencies.coordinator.convertFile(filePath);
+        const result = await this.dependencies.coordinator.convertFile(filePath, options);
 
         if (result.status === ConversionStatus.Failed) {
             this.dependencies.logger.error(

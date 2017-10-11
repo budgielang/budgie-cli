@@ -34,7 +34,7 @@ describe("Runner", () => {
 
             // Act
             const results = await runner.run({
-                files: [inputFilePath],
+                files: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
 
@@ -62,7 +62,7 @@ describe("Runner", () => {
 
             // Act
             const results = await runner.run({
-                files: [inputFilePath],
+                files: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
 

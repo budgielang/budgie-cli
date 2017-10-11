@@ -17,3 +17,7 @@ export const globAllAsync = async (patterns: string[], options: glob.IOptions = 
     (await Promise
         .all(patterns.map(async (pattern: string) => await globAsync(pattern, options))))
         .reduce((allResults: string[], nextResults: string[]) => allResults.concat(nextResults), []);
+
+export type IGlobAsync = typeof globAsync;
+
+export type IGlobAllAsync = typeof globAllAsync;

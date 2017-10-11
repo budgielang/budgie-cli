@@ -69,7 +69,7 @@ export class TypeScriptConverter implements IConverter {
         this.options = options;
         this.transformer = createTransformer();
         this.program = ts.createProgram(
-            options.files,
+            Array.from(options.files),
             {
                 ...dependencies.compilerOptions,
             });
@@ -88,7 +88,7 @@ export class TypeScriptConverter implements IConverter {
             : this.dependencies.compilerOptions.target;
 
         const sourceFile = ts.createSourceFile(basename(filePath), fileContents, scriptTarget, true);
-        let converted: string[] | undefined;
+        let converted: string[];
 
         try {
             converted = this.transformer.transformSourceFile(sourceFile, this.program.getTypeChecker());

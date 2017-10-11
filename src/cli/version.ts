@@ -2,7 +2,7 @@ import * as chalk from "chalk";
 import * as fs from "mz/fs";
 import * as path from "path";
 
-import { ILogger } from "./logger";
+import { ILogger } from "../logger";
 
 interface IPackageInfo {
     version: string;

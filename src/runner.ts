@@ -12,9 +12,9 @@ import { indent } from "./utils/text";
  */
 export interface IRunOptions {
     /**
-     * Files to convert.
+     * Unique file paths to convert.
      */
-    files: string[];
+    files: Set<string>;
 
     /**
      * TypeScript configuration project, if provided.
@@ -87,19 +87,19 @@ export class Runner {
         const promises: Promise<void>[] = [];
         const fileResults: IFileResults = {};
 
-        for (const fileName of options.files) {
+        options.files.forEach((fileName: string) => {
             promises.push(
                 this.runOnFile(fileName, options)
                     .then((result: IConversionResult) => {
                         fileResults[fileName] = result;
                     }));
-        }
+        });
 
         await Promise.all(promises);
         this.dependencies.logger.log(
             chalk.italic("Ran on"),
-            chalk.bold(`${options.files.length}`),
-            chalk.italic(`file${options.files.length === 1 ? "s" : ""}.`));
+            chalk.bold(`${options.files.size}`),
+            chalk.italic(`file${options.files.size === 1 ? "s" : ""}.`));
         return { fileResults };
     }
 

@@ -22,7 +22,7 @@ describe("Coordinator", () => {
     const stubTsconfigFileName = "tsconfig.json";
 
     const stubOptions = (inputFilePath: string): IRunOptions => ({
-        files: [inputFilePath],
+        files: new Set([inputFilePath]),
         typescriptConfig: stubTsconfigFileName,
     });
 

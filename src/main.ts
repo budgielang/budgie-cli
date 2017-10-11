@@ -12,9 +12,9 @@ export enum ExitCode {
 
 export interface IMainDependencies {
     /**
-     * Glob patterns of files to include.
+     * Unique file paths to convert.
      */
-    files: string[];
+    files: Set<string>;
 
     /**
      * Name of the GLS language to convert to.
@@ -32,7 +32,9 @@ export interface IMainDependencies {
     typescriptConfig?: string;
 }
 
-export const main = async (dependencies: IMainDependencies): Promise<number> => {
+export type IMain = (dependencies: IMainDependencies) => Promise<number>;
+
+export const main: IMain = async (dependencies: IMainDependencies): Promise<number> => {
     const printAvailableLanguages = (languageNames: string[]) => {
         dependencies.logger.log("Available languages:");
 

@@ -1,3 +1,17 @@
 #!/usr/bin/env node
 
-require("../lib/cli");
+var cli = require("../lib/cli/cli").cli;
+var ExitCode = require("../lib/main").ExitCode;
+
+var dependencies = {
+    argv: process.argv,
+};
+
+cli(dependencies)
+    .then(function (exitCode) {
+        process.exitCode = exitCode;
+    })
+    .catch(function (error) {
+        console.log("Error in gls-cli: " + error);
+        process.exitCode = ExitCode.Error;
+    });

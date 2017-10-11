@@ -1,4 +1,4 @@
-export * from "./cli";
+export * from "./cli/cli";
 export * from "./converter";
 export * from "./coordinator";
 export * from "./logger";

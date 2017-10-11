@@ -25,6 +25,11 @@ export interface IMainDependencies {
      * Logs information on significant events.
      */
     logger: ILogger;
+
+    /**
+     * TypeScript configuration project, if provided.
+     */
+    typescriptConfig?: string;
 }
 
 export const main = async (dependencies: IMainDependencies): Promise<number> => {
@@ -69,6 +74,7 @@ export const main = async (dependencies: IMainDependencies): Promise<number> => 
 
         await runner.run({
             files: dependencies.files,
+            typescriptConfig: dependencies.typescriptConfig,
         });
 
         return ExitCode.Ok;

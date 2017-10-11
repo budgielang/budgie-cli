@@ -8,6 +8,7 @@ import { printCliVersions } from "./version";
 interface ICliProgram {
     args: string[];
     language?: string;
+    tsconfig?: string;
     help(): void;
 }
 
@@ -15,7 +16,7 @@ const cli = async (logger: ILogger) => {
     const command = program
         .usage("[options] <file ...> --language [language]")
         .option("-l, --language [language]", "language to convert to")
-        .option("-t, --tsconfig", "(TypeScript only) configuration project")
+        .option("-t, --tsconfig [tsconfig]", "(TypeScript only) configuration project")
         .option("-v, --version", "output the CLI and GLS version numbers")
         .on("--help", (): void => {
             logger.log();
@@ -46,6 +47,7 @@ const cli = async (logger: ILogger) => {
         files,
         languageName: command.language as string,
         logger: console,
+        typescriptConfig: command.tsconfig,
     });
 
     process.exitCode = exitCode;

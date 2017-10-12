@@ -20,17 +20,21 @@ const logVersion = (logger: ILogger, alias: string, version: string): void => {
 };
 
 export const printCliVersions = async (logger: ILogger): Promise<void> => {
-    const [cliVersion, glsVersion, tsGlsVersion] = await Promise.all([
-        getPackageVersion(path.join(__dirname, "../package.json")),
+    const [cliVersion, glsVersion, tsGlsVersion, tsVersion] = await Promise.all([
+        getPackageVersion(path.join(__dirname, "../../package.json")),
         getPackageVersion(
             require.resolve("general-language-syntax")
                 .replace(path.normalize("lib/index.js"), "package.json")),
         getPackageVersion(
             require.resolve("ts-gls")
                 .replace(path.normalize("lib/index.js"), "package.json")),
+        getPackageVersion(
+            require.resolve("typescript")
+                .replace(path.normalize("lib/typescript.js"), "package.json")),
     ]);
 
     logVersion(logger, "CLI", cliVersion);
     logVersion(logger, "GLS", glsVersion);
     logVersion(logger, "TS-GLS", tsGlsVersion);
+    logVersion(logger, "TypeScript", tsVersion);
 };

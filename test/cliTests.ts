@@ -39,6 +39,19 @@ describe("CLI", () => {
         return { argv, globber, logger, main };
     };
 
+    describe("version", () => {
+        it("doesn't crash and burn", async () => {
+            // Arrange
+            const dependencies = stubMainDependencies(
+                ["--version"],
+                {},
+                () => {/* ... */});
+
+            // Act
+            await cli(dependencies);
+        });
+    });
+
     describe("files", () => {
         it("includes a provided file", async () => {
             // Arrange

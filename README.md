@@ -64,3 +64,5 @@ To convert `*.ts` to `*.gls`, then to `*.java`:
 ```cmd
 gls --language Java --tsconfig ./tsconfig *.ts
 ```
+
+_Requires Node >=5_

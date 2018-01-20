@@ -8,8 +8,8 @@ export const getExcludes = async (excludes: string | string[] | undefined, globb
     }
 
     if (typeof excludes === "string") {
-        return await getExcludes([excludes], globber);
+        return getExcludes([excludes], globber);
     }
 
-    return await globber(excludes);
+    return globber(excludes);
 };

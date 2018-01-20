@@ -1,4 +1,4 @@
-import * as chalk from "chalk";
+import chalk from "chalk";
 import { EOL } from "os";
 
 import { ConversionStatus, IConversionResult } from "./converter";
@@ -112,7 +112,7 @@ export class Runner {
      * @param options   Options for converting files.
      * @returns A Promise for converting the file.
      */
-    private runOnFile = async (filePath: string, options: IRunOptions) => {
+    private readonly runOnFile = async (filePath: string, options: IRunOptions) => {
         this.dependencies.logger.log(
             chalk.grey("Converting"),
             `${filePath}${chalk.grey("...")}`);

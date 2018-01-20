@@ -88,6 +88,6 @@ export class Coordinator {
             };
         }
 
-        return await preprocessor.convertFile(filePath);
+        return preprocessor.convertFile(filePath);
     }
 }

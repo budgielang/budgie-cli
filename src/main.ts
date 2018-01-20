@@ -1,4 +1,4 @@
-import * as chalk from "chalk";
+import chalk from "chalk";
 import { Language, LanguagesBag } from "general-language-syntax";
 
 import { FileSystem } from "./files";

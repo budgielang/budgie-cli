@@ -44,11 +44,6 @@ export class TypeScriptConverter implements IConverter {
     private readonly dependencies: ITypeScriptConverterDependencies;
 
     /**
-     * Options for converting files.
-     */
-    private readonly options: IRunOptions;
-
-    /**
      * TypeScript program for the conversion run.
      */
     private readonly program: ts.Program;
@@ -66,7 +61,6 @@ export class TypeScriptConverter implements IConverter {
      */
     public constructor(dependencies: ITypeScriptConverterDependencies, options: IRunOptions) {
         this.dependencies = dependencies;
-        this.options = options;
         this.transformer = createTransformer();
         this.program = ts.createProgram(
             Array.from(options.files),

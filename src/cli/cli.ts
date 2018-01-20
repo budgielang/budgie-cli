@@ -69,7 +69,7 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         files.delete(exclude);
     }
 
-    return await mainExecutor({
+    return mainExecutor({
         files,
         languageName: command.language as string,
         logger: console,

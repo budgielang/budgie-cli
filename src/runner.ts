@@ -100,7 +100,7 @@ export class Runner {
         this.dependencies.logger.log(
             chalk.italic("Ran on"),
             chalk.bold(`${options.files.size}`),
-            chalk.italic(`file${options.files.size === 1 ? "s" : ""}.`));
+            chalk.italic(`file${options.files.size === 1 ? "" : "s"}.`));
 
         return { fileResults };
     }

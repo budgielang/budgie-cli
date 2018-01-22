@@ -81,7 +81,7 @@ export class TypeScriptConverter implements IConverter {
             ? defaultScriptTarget
             : this.dependencies.compilerOptions.target;
 
-        const sourceFile = ts.createSourceFile(basename(filePath), fileContents, scriptTarget, true);
+        const sourceFile = this.program.getSourceFile(filePath);
         let converted: string[];
 
         try {

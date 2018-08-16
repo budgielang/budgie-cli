@@ -53,8 +53,8 @@
   },
   "peerDependencies": {
     "general-language-syntax": "^0.3.22",
-    "ts-gls": "^0.1.4",
-    "typescript": "^2.6.2"
+    "ts-gls": "^0.2.0",
+    "typescript": "^3.0.1"
   },
   "scripts": {
     "src": "npm run src:tsc && npm run src:tslint",

@@ -27,7 +27,7 @@ export const printCliVersions = async (logger: ILogger): Promise<void> => {
                 .replace(path.normalize("lib/index.js"), "package.json")),
         getPackageVersion(
             require.resolve("ts-gls")
-                .replace(path.normalize("lib/index.js"), "package.json")),
+                .replace(path.normalize("src/index.js"), "package.json")),
         getPackageVersion(
             require.resolve("typescript")
                 .replace(path.normalize("lib/typescript.js"), "package.json")),

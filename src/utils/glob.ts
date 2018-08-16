@@ -1,5 +1,7 @@
 import * as glob from "glob";
 
+export { IOptions as IGlobOptions } from "glob";
+
 export const globAsync = async (pattern: string, options: glob.IOptions = {}): Promise<string[]> =>
     new Promise<string[]>((resolve, reject) => {
         glob(pattern, options, (error: Error | null, matches: string[]) => {

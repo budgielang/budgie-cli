@@ -24,61 +24,65 @@ describe("Runner", () => {
         it("converts a GLS file to C#", async () => {
             // Arrange
             const inputFilePath = "file.gls";
+            const inputFileContents = "comment line : Hello world!";
             const outputFilePath = "file.cs";
             const { fileSystem, runner } = createTestRunner(
                 "C#",
                 {
-                    [inputFilePath]: "comment line : Hello world!",
+                    [inputFilePath]: inputFileContents,
                     [stubTsconfigFileName]: "{}",
                 });
 
             // Act
             const results = await runner.run({
-                files: new Set([inputFilePath]),
+                files: new Map([
+                    [inputFilePath, inputFileContents],
+                ]),
                 typescriptConfig: stubTsconfigFileName,
             });
 
             // Assert
-            const expectedResults = "// Hello world!";
-            expect(fileSystem.files[outputFilePath]).to.be.equal(expectedResults);
             expect(results.fileResults).to.be.deep.equal({
                 [inputFilePath]: {
                     outputPath: outputFilePath,
                     status: ConversionStatus.Succeeded,
                 },
             });
+            expect(fileSystem.files[outputFilePath]).to.be.equal("// Hello world!");
         });
 
         it("converts a TypeScript file to C#", async () => {
             // Arrange
             const inputFilePath = "file.ts";
+            const inputFileContents = 'console.log("Hello world!");';
             const outputFilePath = "file.cs";
             const { fileSystem, runner } = createTestRunner(
                 "C#",
                 {
-                    [inputFilePath]: 'console.log("Hello world!");',
+                    [inputFilePath]: inputFileContents,
                     [stubTsconfigFileName]: "{}",
                 });
 
             // Act
             const results = await runner.run({
-                files: new Set([inputFilePath]),
+                files: new Map([
+                    [inputFilePath, inputFileContents],
+                ]),
                 typescriptConfig: stubTsconfigFileName,
             });
 
             // Assert
-            const expectedResults = [
-                "using System;",
-                "",
-                'Console.WriteLine("Hello world!");',
-            ].join(EOL);
-            expect(fileSystem.files[outputFilePath]).to.be.equal(expectedResults);
             expect(results.fileResults).to.be.deep.equal({
                 [inputFilePath]: {
                     outputPath: outputFilePath,
                     status: ConversionStatus.Succeeded,
                 },
             });
+            expect(fileSystem.files[outputFilePath]).to.be.equal([
+                "using System;",
+                "",
+                'Console.WriteLine("Hello world!");',
+            ].join(EOL));
         });
     });
 });

@@ -26,11 +26,13 @@ describe("CLI", () => {
         };
 
     const stubMainDependencies = (
-        extraArgv: string[], globExpansions: IGlobExpansions, innerMain: (dependencies: IMainDependencies) => void) => {
+        extraArgv: string[],
+        globExpansions: IGlobExpansions,
+        innerMain: (dependencies: IMainDependencies) => void,
+    ) => {
         const argv = ["node", "gls-cli", "--language", "Java", ...extraArgv];
         const globber = stubGlobber(globExpansions);
         const logger = stubLogger();
-
         const main = async (mainArgs: IMainDependencies) => {
             innerMain(mainArgs);
             return ExitCode.Ok;

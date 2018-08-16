@@ -89,7 +89,7 @@ export class Runner {
 
         await queueAsyncActions(
             Array.from(options.files)
-                .map(([fileName, fileContents]) =>
+                .map(([fileName]) =>
                     async () => {
                         await this.runOnFile(fileName, options)
                             .then((result: IConversionResult) => {

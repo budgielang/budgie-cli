@@ -1,4 +1,4 @@
-import { ConversionContext, Language } from "general-language-syntax";
+import { Gls, Language } from "general-language-syntax";
 import { EOL } from "os";
 
 import { ConversionStatus, IConversionResult, IConverter } from "../converter";
@@ -30,14 +30,14 @@ export const glsExtension = ".gls";
  */
 export class GlsConverter implements IConverter {
     /**
-     * Driving context to use a parse GLS into language outputs.
-     */
-    private readonly context: ConversionContext;
-
-    /**
      * Dependencies used for initialization.
      */
     private readonly dependencies: IGlsConverterDependencies;
+
+    /**
+     * Driving context to use a parse GLS into language outputs.
+     */
+    private readonly gls: Gls;
 
     /**
      * Initializes a new instance of the GlsConverter class.
@@ -45,7 +45,7 @@ export class GlsConverter implements IConverter {
      * @param dependencies   Dependencies used for initialization.
      */
     public constructor(dependencies: IGlsConverterDependencies) {
-        this.context = new ConversionContext(dependencies.language);
+        this.gls = new Gls(dependencies.language.properties.general.name);
         this.dependencies = dependencies;
     }
 
@@ -60,7 +60,7 @@ export class GlsConverter implements IConverter {
         const outputPath = replaceFileExtension(filePath, glsExtension, newExtension);
 
         try {
-            const results = this.context.convert(
+            const results = this.gls.convert(
                 (await this.dependencies.fileSystem.readFile(filePath))
                     .split(/\r\n|\r|\n/g));
 

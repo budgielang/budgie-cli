@@ -60,10 +60,7 @@
     "test": "npm run test:tsc && npm run test:tslint && npm run test:run",
     "test:tsc": "tsc -p test",
     "test:tslint": "tslint -c tslint.json -p test/tsconfig.json -t stylish",
-    "test:run": "mocha test/unit/**/*.js",
-    "util": "npm run util:tsc && npm run util:tslint",
-    "util:tsc": "tsc -p util",
-    "util:tslint": "tslint -c tslint.json -p util/tsconfig.json -t stylish",
-    "verify": "npm run src && npm run util && npm run test"
+    "test:run": "mocha test/**/*.js",
+    "verify": "npm run src && npm run test"
   }
 }

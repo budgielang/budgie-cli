@@ -22,7 +22,9 @@ describe("Coordinator", () => {
     const stubTsconfigFileName = "tsconfig.json";
 
     const stubOptions = (inputFilePath: string): IRunOptions => ({
-        files: new Set([inputFilePath]),
+        files: new Map([
+            [inputFilePath, inputFilePath],
+        ]),
         typescriptConfig: stubTsconfigFileName,
     });
 
@@ -30,16 +32,22 @@ describe("Coordinator", () => {
         it("converts a GLS file to C#", async () => {
             // Arrange
             const inputFilePath = "file.gls";
+            const inputFileContents = "comment line : Hello world!";
             const outputFilePath = "file.cs";
             const { coordinator, fileSystem } = createTestCoordinator(
                 "C#",
                 {
-                    [inputFilePath]: "comment line : Hello world!",
+                    [inputFilePath]: inputFileContents,
                     [stubTsconfigFileName]: "{}",
                 });
 
             // Act
-            const result = await coordinator.convertFile(inputFilePath, stubOptions(inputFilePath));
+            const result = await coordinator.convertFile(inputFilePath, {
+                files: new Map([
+                    [inputFilePath, inputFileContents],
+                ]),
+                typescriptConfig: stubTsconfigFileName,
+            });
 
             // Assert
             expect(result).to.be.deep.equal({
@@ -52,16 +60,22 @@ describe("Coordinator", () => {
         it("converts a TypeScript file to C#", async () => {
             // Arrange
             const inputFilePath = "file.ts";
+            const inputFileContents = 'console.log("Hello world!");';
             const outputFilePath = "file.cs";
             const { coordinator, fileSystem } = createTestCoordinator(
                 "C#",
                 {
-                    [inputFilePath]: 'console.log("Hello world!");',
+                    [inputFilePath]: inputFileContents,
                     [stubTsconfigFileName]: "{}",
                 });
 
             // Act
-            const result = await coordinator.convertFile(inputFilePath, stubOptions(inputFilePath));
+            const result = await coordinator.convertFile(inputFilePath, {
+                files: new Map([
+                    [inputFilePath, inputFileContents],
+                ]),
+                typescriptConfig: stubTsconfigFileName,
+            });
 
             // Assert
             expect(result).to.be.deep.equal({

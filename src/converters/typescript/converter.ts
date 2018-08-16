@@ -31,7 +31,7 @@ export const tsExtension = ".ts";
 const createSourceFilesMap = (options: IRunOptions) => {
     const map = new Map<string, ts.SourceFile>();
 
-    options.files.forEach((fileName, fileContents) => {
+    options.files.forEach((fileContents, fileName) => {
         map.set(fileName, ts.createSourceFile(fileName, fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS));
     });
 

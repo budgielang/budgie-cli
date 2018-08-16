@@ -1,6 +1,6 @@
-import { IOptions } from "glob"; // tslint:disable-line:no-unused-variable
+import { IGlobAllAsync, IGlobOptions } from "../utils/glob";
 
-import { IGlobAllAsync } from "../utils/glob";
+export { IGlobOptions };
 
 export const getExcludes = async (excludes: string | string[] | undefined, globber: IGlobAllAsync): Promise<string[]> => {
     if (excludes === undefined) {

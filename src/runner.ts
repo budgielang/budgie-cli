@@ -13,9 +13,9 @@ import { indent } from "./utils/text";
  */
 export interface IRunOptions {
     /**
-     * Unique file paths to convert.
+     * Contents of file paths to convert, keyed by unique file name.
      */
-    files: Set<string>;
+    files: Map<string, string>;
 
     /**
      * TypeScript configuration project, if provided.
@@ -89,7 +89,7 @@ export class Runner {
 
         await queueAsyncActions(
             Array.from(options.files)
-                .map((fileName: string) =>
+                .map(([fileName, fileContents]) =>
                     async () => {
                         await this.runOnFile(fileName, options)
                             .then((result: IConversionResult) => {

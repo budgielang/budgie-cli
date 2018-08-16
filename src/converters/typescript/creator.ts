@@ -14,7 +14,7 @@ import { TypeScriptConverter } from "./converter";
 export const createTypeScriptConverter = async (dependencies: IConverterDependencies, options: IRunOptions) => {
     const { typescriptConfig } = options;
     if (typescriptConfig === undefined) {
-        return "No TypeScript configuration file provided.";
+        return "No TypeScript configuration file provided (--tsconfig).";
     }
 
     let optionsRaw: string | undefined;

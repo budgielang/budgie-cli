@@ -32,6 +32,16 @@ export interface IMainDependencies {
     typescriptConfig?: string;
 }
 
+const createFileContentsMap = async (filePaths: Set<string>, fileSystem: FileSystem) => {
+    const map = new Map<string, string>();
+
+    for (const filePath of Array.from(filePaths)) {
+        map.set(filePath, await fileSystem.readFile(filePath));
+    }
+
+    return map;
+};
+
 export type IMain = (dependencies: IMainDependencies) => Promise<number>;
 
 export const main: IMain = async (dependencies: IMainDependencies): Promise<number> => {
@@ -68,14 +78,16 @@ export const main: IMain = async (dependencies: IMainDependencies): Promise<numb
             return ExitCode.Error;
         }
 
+        const fileSystem = new FileSystem();
+
         const runner = createRunner({
-            fileSystem: new FileSystem(),
+            fileSystem,
             language,
             logger: dependencies.logger,
         });
 
         await runner.run({
-            files: dependencies.files,
+            files: await createFileContentsMap(dependencies.files, fileSystem),
             typescriptConfig: dependencies.typescriptConfig,
         });
 

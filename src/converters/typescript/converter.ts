@@ -1,5 +1,4 @@
 import { EOL } from "os";
-import { basename } from "path";
 import { createTransformer, Transformer } from "ts-gls";
 import * as ts from "typescript";
 
@@ -29,10 +28,15 @@ export interface ITypeScriptConverterDependencies {
  */
 export const tsExtension = ".ts";
 
-/**
- * Default script target to compile with.
- */
-const defaultScriptTarget = ts.ScriptTarget.Latest;
+const createSourceFilesMap = (options: IRunOptions) => {
+    const map = new Map<string, ts.SourceFile>();
+
+    options.files.forEach((fileName, fileContents) => {
+        map.set(fileName, ts.createSourceFile(fileName, fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS));
+    });
+
+    return map;
+};
 
 /**
  * Converts TypeScript files to their GLS outputs.
@@ -44,9 +48,9 @@ export class TypeScriptConverter implements IConverter {
     private readonly dependencies: ITypeScriptConverterDependencies;
 
     /**
-     * TypeScript program for the conversion run.
+     * TypeScript source files, keyed by unique file path.
      */
-    private readonly program: ts.Program;
+    private readonly sourceFiles: Map<string, ts.SourceFile>;
 
     /**
      * Transforms TypeScript to GLS.
@@ -61,12 +65,13 @@ export class TypeScriptConverter implements IConverter {
      */
     public constructor(dependencies: ITypeScriptConverterDependencies, options: IRunOptions) {
         this.dependencies = dependencies;
-        this.transformer = createTransformer();
-        this.program = ts.createProgram(
-            Array.from(options.files),
-            {
-                ...dependencies.compilerOptions,
-            });
+        this.sourceFiles = createSourceFilesMap(options);
+        this.transformer = createTransformer({
+            compilerOptions: {
+                noLib: true,
+            },
+            sourceFiles: Array.from(this.sourceFiles.values()),
+        });
     }
 
     /**
@@ -76,16 +81,15 @@ export class TypeScriptConverter implements IConverter {
      * @returns The file's GLS output.
      */
     public async convertFile(filePath: string): Promise<IConversionResult> {
-        const fileContents = await this.dependencies.fileSystem.readFile(filePath);
-        const scriptTarget = this.dependencies.compilerOptions.target === undefined
-            ? defaultScriptTarget
-            : this.dependencies.compilerOptions.target;
+        const sourceFile = this.sourceFiles.get(filePath);
+        if (sourceFile === undefined) {
+            throw new Error(`Unknown source file: '${filePath}'.`);
+        }
 
-        const sourceFile = this.program.getSourceFile(filePath);
         let converted: string[];
 
         try {
-            converted = this.transformer.transformSourceFile(sourceFile, this.program.getTypeChecker());
+            converted = this.transformer.transformSourceFile(sourceFile);
         } catch (error) {
             return {
                 error,

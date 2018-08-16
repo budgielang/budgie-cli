@@ -60,7 +60,7 @@
     "test": "npm run test:tsc && npm run test:tslint && npm run test:run",
     "test:tsc": "tsc -p test",
     "test:tslint": "tslint -c tslint.json -p test/tsconfig.json -t stylish",
-    "test:run": "mocha test/**/*.js",
+    "test:run": "mocha test/*.js test/**/*.js",
     "verify": "npm run src && npm run test"
   }
 }

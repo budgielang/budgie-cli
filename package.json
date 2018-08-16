@@ -26,12 +26,9 @@
   "dependencies": {
     "chalk": "^2.4.1",
     "commander": "^2.17.1",
-    "general-language-syntax": "^0.3.22",
     "glob": "^7.1.2",
     "minimatch": "^3.0.4",
-    "mz": "^2.7.0",
-    "ts-gls": "^0.1.4",
-    "typescript": "^3.0.1"
+    "mz": "^2.7.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",

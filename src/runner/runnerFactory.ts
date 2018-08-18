@@ -1,8 +1,8 @@
 import { Language } from "general-language-syntax";
 
-import { createCoordinator } from "./coordinatorFactory";
-import { IFileSystem } from "./files";
-import { ILogger } from "./logger";
+import { createCoordinator } from "../coordinatorFactory";
+import { IFileSystem } from "../files";
+import { ILogger } from "../logger";
 import { Runner } from "./runner";
 
 export interface ICreateRunnerDependencies {

@@ -4,23 +4,31 @@ import * as ts from "typescript";
 
 import { ConversionStatus, IConversionResult, IConverter } from "../../converter";
 import { IFileSystem } from "../../files";
-import { IRunOptions } from "../../runner";
+import { IRunOptions } from "../../runner/runner";
 import { replaceFileExtension } from "../../utils/extensions";
+import { defaultValue } from "../../utils/values";
 import { glsExtension } from "../gls";
+
+export interface ITsconfigOptions {
+    compilerOptions: ts.CompilerOptions;
+    exclude?: ReadonlyArray<string>;
+    files?: ReadonlyArray<string>;
+    include: ReadonlyArray<string>;
+}
 
 /**
  * Dependencies to initialize a new instance of the TypeScriptConverter class.
  */
 export interface ITypeScriptConverterDependencies {
     /**
-     * Options for the TypeScript compiler.
-     */
-    compilerOptions: ts.CompilerOptions;
-
-    /**
      * Reads and writes files.
      */
     fileSystem: IFileSystem;
+
+    /**
+     * Options for the TypeScript compiler.
+     */
+    tsconfigOptions: ITsconfigOptions;
 }
 
 /**
@@ -28,11 +36,18 @@ export interface ITypeScriptConverterDependencies {
  */
 export const tsExtension = ".ts";
 
-const createSourceFilesMap = (options: IRunOptions) => {
+/**
+ * Creates TS source files for each file name.
+ *
+ * @param options   Options for converting files.
+ * @param scriptTarget   Specified TypeScript language output target.
+ * @returns TypeScript source files, keyed by unique file path.
+ */
+const createSourceFilesMap = (options: IRunOptions, scriptTarget: ts.ScriptTarget): Map<string, ts.SourceFile> => {
     const map = new Map<string, ts.SourceFile>();
 
-    options.files.forEach((fileContents, fileName) => {
-        map.set(fileName, ts.createSourceFile(fileName, fileContents, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS));
+    options.existingFileContents.forEach((fileContents: string, fileName: string) => {
+        map.set(fileName, ts.createSourceFile(fileName, fileContents, scriptTarget, true, ts.ScriptKind.TS));
     });
 
     return map;
@@ -65,11 +80,11 @@ export class TypeScriptConverter implements IConverter {
      */
     public constructor(dependencies: ITypeScriptConverterDependencies, options: IRunOptions) {
         this.dependencies = dependencies;
-        this.sourceFiles = createSourceFilesMap(options);
+
+        this.sourceFiles = createSourceFilesMap(
+            options,
+            defaultValue(dependencies.tsconfigOptions.compilerOptions.target, () => ts.ScriptTarget.Latest));
         this.transformer = createTransformer({
-            compilerOptions: {
-                noLib: true,
-            },
             sourceFiles: Array.from(this.sourceFiles.values()),
         });
     }
@@ -86,7 +101,7 @@ export class TypeScriptConverter implements IConverter {
             throw new Error(`Unknown source file: '${filePath}'.`);
         }
 
-        let converted: string[];
+        let converted: ReadonlyArray<string>;
 
         try {
             converted = this.transformer.transformSourceFile(sourceFile);

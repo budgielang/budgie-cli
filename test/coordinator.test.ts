@@ -22,7 +22,7 @@ describe("Coordinator", () => {
     const stubTsconfigFileName = "tsconfig.json";
 
     const stubOptions = (inputFilePath: string): IRunOptions => ({
-        files: new Map([
+        existingFileContents: new Map([
             [inputFilePath, inputFilePath],
         ]),
         typescriptConfig: stubTsconfigFileName,
@@ -43,9 +43,10 @@ describe("Coordinator", () => {
 
             // Act
             const result = await coordinator.convertFile(inputFilePath, {
-                files: new Map([
+                existingFileContents: new Map([
                     [inputFilePath, inputFileContents],
                 ]),
+                requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
 
@@ -71,9 +72,10 @@ describe("Coordinator", () => {
 
             // Act
             const result = await coordinator.convertFile(inputFilePath, {
-                files: new Map([
+                existingFileContents: new Map([
                     [inputFilePath, inputFileContents],
                 ]),
+                requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
 

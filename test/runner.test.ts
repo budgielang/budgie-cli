@@ -35,7 +35,7 @@ describe("Runner", () => {
 
             // Act
             const results = await runner.run({
-                files: new Map([
+                existingFileContents: new Map([
                     [inputFilePath, inputFileContents],
                 ]),
                 typescriptConfig: stubTsconfigFileName,
@@ -65,7 +65,7 @@ describe("Runner", () => {
 
             // Act
             const results = await runner.run({
-                files: new Map([
+                existingFileContents: new Map([
                     [inputFilePath, inputFileContents],
                 ]),
                 typescriptConfig: stubTsconfigFileName,

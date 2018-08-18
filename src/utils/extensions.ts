@@ -16,6 +16,6 @@ export const getFileExtension = (filePath: string) =>
  * @returns The file's equivalent with the new extension.
  */
 export const replaceFileExtension = (filePath: string, oldExtension: string, newExtension: string): string =>
-        filePath.substring(filePath.length - oldExtension.length) === oldExtension
-            ? `${filePath.substring(0, filePath.length - oldExtension.length)}${newExtension}`
-            : `${filePath}${newExtension}`;
+    filePath.substring(filePath.length - oldExtension.length) === oldExtension
+        ? `${filePath.substring(0, filePath.length - oldExtension.length)}${newExtension}`
+        : `${filePath}${newExtension}`;

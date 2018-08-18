@@ -1,5 +1,5 @@
 import { IConverterDependencies } from "./coordinator";
-import { IRunOptions } from "./runner";
+import { IRunOptions } from "./runner/runner";
 
 /**
  * Status from a conversion attempt.
@@ -69,6 +69,6 @@ export interface IConverter {
  *
  * @param dependencies   Dependencies to create the converter.
  * @param options   Options for converting files.
- * @returns A Promise for a converter or error string.
+ * @returns Promise for a converter or error.
  */
-export type IConverterCreator = (dependencies: IConverterDependencies, options: IRunOptions) => Promise<IConverter | string>;
+export type IConverterCreator = (dependencies: IConverterDependencies, options: IRunOptions) => Promise<IConverter | Error>;

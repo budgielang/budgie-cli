@@ -2,7 +2,10 @@ import { IGlobAllAsync, IGlobOptions } from "../utils/glob";
 
 export { IGlobOptions };
 
-export const getExcludes = async (excludes: string | string[] | undefined, globber: IGlobAllAsync): Promise<string[]> => {
+export const getExcludes = async (
+    excludes: string | ReadonlyArray<string> | undefined,
+    globber: IGlobAllAsync,
+): Promise<ReadonlyArray<string>> => {
     if (excludes === undefined) {
         return [];
     }

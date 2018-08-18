@@ -6,12 +6,12 @@ import { ExitCode, IMainDependencies } from "../lib/main";
 import { stubLogger } from "./stubs";
 
 interface IGlobExpansions {
-    [i: string]: string[];
+    [i: string]: ReadonlyArray<string>;
 }
 
 describe("CLI", () => {
     const stubGlobber = (globExpansions: IGlobExpansions) =>
-        async (patterns: string[]) => {
+        async (patterns: ReadonlyArray<string>) => {
             const results = [];
 
             for (const pattern of patterns) {
@@ -26,7 +26,7 @@ describe("CLI", () => {
         };
 
     const stubMainDependencies = (
-        extraArgv: string[],
+        extraArgv: ReadonlyArray<string>,
         globExpansions: IGlobExpansions,
         innerMain: (dependencies: IMainDependencies) => void,
     ) => {

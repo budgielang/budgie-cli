@@ -55,7 +55,7 @@
   },
   "scripts": {
     "src": "npm run src:tsc && npm run src:tslint",
-    "src:tsc": "tsc -p .",
+    "src:tsc": "tsc",
     "src:tslint": "tslint -c tslint.json -p tsconfig.json -t stylish",
     "test": "npm run test:tsc && npm run test:tslint && npm run test:run",
     "test:tsc": "tsc -p test",

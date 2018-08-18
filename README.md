@@ -78,4 +78,59 @@ npm run verify
 ```
 
 Check `package.json` for the full list of commands.
-To set up source file compiling in watch mode, use `tsc -p . -w`.
+To set up source file compiling in watch mode, use `tsc -w`.
+
+### Tests
+
+Run `tsc -p test` to build tests, or `tsc -p test -w` to rebuild the files in watch mode.
+Run `npm run test:run` to run tests. 
+
+### Internals
+
+When the CLI is called, the following code paths are used in order:
+
+1. `Cli`
+2. `Main`
+3. `Runner`
+4. `Coordinator`
+
+#### `Cli`
+
+Parses raw string arguments using `commander`.
+If the args are valid, it calls to the `Main` method.
+
+System dependencies such as the [`IFileSystem`](./src/files.ts) and globber may be dependency-injected to override the defaults.
+
+See [`cli.ts`](./src/cli/cli.ts).
+
+#### `Main`
+
+Validates GLS settings, sets up a conversion `Runner`, and runs it.
+There are two real behaviors here not covered by the `Cli`:
+
+* Globbing file paths passed as glob args and reading them the file system.
+* Validating the provided language is known by GLS.
+
+See [`main.ts`](./src/main.ts).
+
+#### `Runner`
+
+Launches a `Coordinator`-managed conversion for each file, then reports the conversion results.
+
+Uses an async queue to throttle the number of files that are attempted to be converted at once, as some conversions may need asynchronous operations.
+
+See [`runner.ts`](./src/runner/runner.ts) and [`runnerFactory.ts`](./src/runner/runnerFactory.ts`).
+
+#### `Coordinator`
+
+The driving class behind taking in files and outputting converted `.gls` files.
+Given a file passed to its `convertFile`, it will attempt to convert that file to a `.gls` file by:
+
+1. Preprocessing the file if the file extension requires it
+2. Converting the file using the `Converter`
+
+For example, if a `.ts` file is provided, it will attempt to convert it using [TS-GLS[(https://github.com/general-language-syntax/ts-gls) and return the generated `.gls` file path.
+If a `.gls` file path is provided, it will do nothing and pass that path through.
+
+See [`coordinator.ts`](./src/coordinator.ts) and [`coordinatorFactory.ts`](./src/coordinatorFactory).
+

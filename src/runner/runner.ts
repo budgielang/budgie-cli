@@ -1,24 +1,31 @@
 import chalk from "chalk";
 import { EOL } from "os";
 
-import { ConversionStatus, IConversionResult } from "./converter";
-import { Coordinator } from "./coordinator";
-import { IFileSystem } from "./files";
-import { ILogger } from "./logger";
-import { queueAsyncActions } from "./utils/asyncQueue";
-import { indent } from "./utils/text";
+import { ConversionStatus, IConversionResult } from "../converter";
+import { Coordinator } from "../coordinator";
+import { IFileSystem } from "../files";
+import { ILogger } from "../logger";
+import { queueAsyncActions } from "../utils/asyncQueue";
+import { indent } from "../utils/text";
 
 /**
  * Options to convert a set of files.
  */
 export interface IRunOptions {
     /**
-     * Contents of file paths to convert, keyed by unique file name.
+     * Cache of contents of file paths to convert, keyed by unique file name.
+     *
+     * @remarks This may be added to by converters as they need more files.
      */
-    files: Map<string, string>;
+    existingFileContents: Map<string, string>;
 
     /**
-     * TypeScript configuration project, if provided.
+     * File paths requested to be converted.
+     */
+    requestedFiles: ReadonlySet<string>;
+
+    /**
+     * TypeScript configuration project file path, if provided.
      */
     typescriptConfig?: string;
 }
@@ -82,14 +89,14 @@ export class Runner {
      * Converts a set of files.
      *
      * @param options   Options for converting files.
-     * @returns A Promise for converting the files.
+     * @returns Promise for converting the files.
      */
     public async run(options: IRunOptions): Promise<IRunResults> {
         const fileResults: IFileResults = {};
 
         await queueAsyncActions(
-            Array.from(options.files)
-                .map(([fileName]) =>
+            Array.from(options.requestedFiles)
+                .map((fileName) =>
                     async () => {
                         await this.runOnFile(fileName, options)
                             .then((result: IConversionResult) => {
@@ -99,8 +106,8 @@ export class Runner {
 
         this.dependencies.logger.log(
             chalk.italic("Ran on"),
-            chalk.bold(`${options.files.size}`),
-            chalk.italic(`file${options.files.size === 1 ? "" : "s"}.`));
+            chalk.bold(`${options.requestedFiles.size}`),
+            chalk.italic(`file${options.existingFileContents.size === 1 ? "" : "s"}.`));
 
         return { fileResults };
     }
@@ -110,7 +117,7 @@ export class Runner {
      *
      * @param filePath   Path to the file.
      * @param options   Options for converting files.
-     * @returns A Promise for converting the file.
+     * @returns Promise for converting the file.
      */
     private readonly runOnFile = async (filePath: string, options: IRunOptions) => {
         this.dependencies.logger.log(

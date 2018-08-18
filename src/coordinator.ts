@@ -1,7 +1,7 @@
 import { ConversionStatus, IConversionResult, IConverter, IConverterCreator } from "./converter";
 import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
-import { IRunOptions } from "./runner";
+import { IRunOptions } from "./runner/runner";
 import { getFileExtension } from "./utils/extensions";
 
 /**
@@ -39,12 +39,18 @@ export class Coordinator {
     private readonly dependencies: IConverterDependencies;
 
     /**
+     * Cached converter or error results for each preprocessor creator.
+     */
+    private readonly preprocessors: Map<IConverterCreator, IConverter | Error>;
+
+    /**
      * Initializes a new instance of the Converter class.
      *
      * @param dependencies   Dependencies used for initialization.
      */
     public constructor(dependencies: IConverterDependencies) {
         this.dependencies = dependencies;
+        this.preprocessors = new Map();
     }
 
     /**
@@ -52,7 +58,7 @@ export class Coordinator {
      *
      * @param filePath   Original file path.
      * @param options   Options for converting files.
-     * @returns A Promise for the file's language output.
+     * @returns Promise for the file's language output.
      */
     public async convertFile(filePath: string, options: IRunOptions): Promise<IConversionResult> {
         const preprocessResult = await this.preprocessFile(filePath, options);
@@ -68,7 +74,7 @@ export class Coordinator {
      *
      * @param filePath   Original file path.
      * @param options   Options for converting files.
-     * @returns A Promise for processed path to the file.
+     * @returns Promise for processed path to the file.
      */
     private async preprocessFile(filePath: string, options: IRunOptions): Promise<IConversionResult> {
         const fileExtension = getFileExtension(filePath);
@@ -80,14 +86,32 @@ export class Coordinator {
             };
         }
 
-        const preprocessor = await preprocessorCreator(this.dependencies, options);
-        if (typeof preprocessor === "string") {
+        const preprocessor = await this.getPreprocessor(preprocessorCreator, options);
+        if (preprocessor instanceof Error) {
             return {
-                error: new Error(preprocessor),
+                error: preprocessor,
                 status: ConversionStatus.Failed,
             };
         }
 
         return preprocessor.convertFile(filePath);
+    }
+
+    /**
+     * Gets the cached preprocessor for a file type, creating a new preprocessor needed.
+     *
+     * @param preprocessorCreator   Preprocessor for a file type.
+     * @param options   Options to create the preprocessor.
+     * @returns Promise for the cached preprocessor.
+     */
+    private async getPreprocessor(preprocessorCreator: IConverterCreator, options: IRunOptions) {
+        let preprocessor = this.preprocessors.get(preprocessorCreator);
+
+        if (preprocessor === undefined) {
+            preprocessor = await preprocessorCreator(this.dependencies, options);
+            this.preprocessors.set(preprocessorCreator, preprocessor);
+        }
+
+        return preprocessor;
     }
 }

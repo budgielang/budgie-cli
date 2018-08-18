@@ -1,20 +1,29 @@
 import chalk from "chalk";
 import { Language, LanguagesBag } from "general-language-syntax";
 
-import { FileSystem } from "./files";
+import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
-import { createRunner } from "./runnerFactory";
+import { createRunner } from "./runner/runnerFactory";
+import { queueAsyncActions } from "./utils/asyncQueue";
 
 export enum ExitCode {
     Ok = 0,
     Error = 1,
 }
 
+/**
+ * Dependencies to set up and run a runner.
+ */
 export interface IMainDependencies {
     /**
      * Unique file paths to convert.
      */
-    files: Set<string>;
+    files: ReadonlySet<string>;
+
+    /**
+     * Reads and writes files.
+     */
+    fileSystem: IFileSystem;
 
     /**
      * Name of the GLS language to convert to.
@@ -32,20 +41,33 @@ export interface IMainDependencies {
     typescriptConfig?: string;
 }
 
-const createFileContentsMap = async (filePaths: Set<string>, fileSystem: FileSystem) => {
+/**
+ * Reads a set of file paths into memory.
+ *
+ * @param filePaths   Unique file paths to read in.
+ * @param fileSystem   Reads and writes files.
+ * @returns File contents of the files, keyed by file path.
+ */
+const readFilesFromSystem = async (filePaths: ReadonlySet<string>, fileSystem: IFileSystem) => {
     const map = new Map<string, string>();
 
-    for (const filePath of Array.from(filePaths)) {
-        map.set(filePath, await fileSystem.readFile(filePath));
-    }
+    await queueAsyncActions(
+        Array.from(filePaths)
+            .map((filePath: string) =>
+                async () => {
+                    map.set(filePath, await fileSystem.readFile(filePath));
+                }));
 
     return map;
 };
 
-export type IMain = (dependencies: IMainDependencies) => Promise<number>;
-
-export const main: IMain = async (dependencies: IMainDependencies): Promise<number> => {
-    const printAvailableLanguages = (languageNames: string[]) => {
+/**
+ * Validates GLS settings, sets up a conversion runner, and runs it.
+ *
+ * @param dependencies   Dependencies to set up and run a runner.
+ */
+export const main = async (dependencies: IMainDependencies): Promise<ExitCode> => {
+    const printAvailableLanguages = (languageNames: ReadonlyArray<string>) => {
         dependencies.logger.log("Available languages:");
 
         for (const languageName of languageNames) {
@@ -78,16 +100,15 @@ export const main: IMain = async (dependencies: IMainDependencies): Promise<numb
             return ExitCode.Error;
         }
 
-        const fileSystem = new FileSystem();
-
         const runner = createRunner({
-            fileSystem,
+            fileSystem: dependencies.fileSystem,
             language,
             logger: dependencies.logger,
         });
 
         await runner.run({
-            files: await createFileContentsMap(dependencies.files, fileSystem),
+            existingFileContents: await readFilesFromSystem(dependencies.files, dependencies.fileSystem),
+            requestedFiles: dependencies.files,
             typescriptConfig: dependencies.typescriptConfig,
         });
 
@@ -101,3 +122,5 @@ export const main: IMain = async (dependencies: IMainDependencies): Promise<numb
         return ExitCode.Error;
     }
 };
+
+export type IMain = typeof main;

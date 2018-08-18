@@ -1,34 +1,85 @@
 import * as commander from "commander";
 
+import { FileSystem, IFileSystem } from "../files";
 import { ILogger } from "../logger";
 import { ExitCode, IMain, main } from "../main";
 import { globAllAsync, IGlobAllAsync } from "../utils/glob";
+import { defaultValue } from "../utils/values";
 import { getExcludes } from "./exclude";
 import { printCliVersions } from "./version";
 
-interface ICliProgram {
-    args: string[];
-    exclude?: string | string[];
-    language?: string;
-    tsconfig?: string;
-    help(): void;
-}
-
+/**
+ * Dependencies to run the CLI.
+ */
 export interface ICliDependencies {
-    argv: string[];
+    /**
+     * Raw argv-style string args from a command-line.
+     */
+    argv: ReadonlyArray<string>;
+
+    /**
+     * System to read and write files, if not an fs-based default.
+     */
+    fileSystem?: IFileSystem;
+
+    /**
+     * Finds file names from glob patterns, if not a glob-based default.
+     */
     globber?: IGlobAllAsync;
+
+    /**
+     * Logs information, if not the console.
+     */
     logger?: ILogger;
+
+    /**
+     * Main method to pass parsed arguments into.
+     */
     main?: IMain;
 }
 
-const defaultMember = <T>(member: T | undefined, defaultValue: T): T =>
-    member === undefined ? defaultValue : member;
+/**
+ * Commander-parsed arguments passed in.
+ */
+interface IParsedArguments {
+    /**
+     * Raw args to be used as file globs.
+     */
+    args: ReadonlyArray<string>;
 
+    /**
+     * File glob(s) to exclude.
+     */
+    exclude?: string | ReadonlyArray<string>;
+
+    /**
+     * GLS language to convert to.
+     */
+    language?: string;
+
+    /**
+     * TypeScript configuration project, if provided.
+     */
+    tsconfig?: string;
+
+    /**
+     * Displays help text via the logger.
+     */
+    help(): void;
+}
+
+/**
+ * Parses raw string arguments and, if they're valid, calls to a main method.
+ *
+ * @param dependencies   Raw string arguments and any system dependency overrides.
+ * @returns Promise for the result of the main method.
+ */
 export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => {
     const { argv } = dependencies;
-    const globber = defaultMember(dependencies.globber, globAllAsync);
-    const logger = defaultMember(dependencies.logger, console);
-    const mainExecutor = defaultMember(dependencies.main, main);
+    const fileSystem = defaultValue(dependencies.fileSystem, () => new FileSystem());
+    const globber = defaultValue(dependencies.globber, () => globAllAsync);
+    const logger = defaultValue(dependencies.logger, () => console);
+    const mainExecutor = defaultValue(dependencies.main, () => main);
 
     const command = new commander.Command()
         .usage("[options] <file ...> --language [language]")
@@ -47,7 +98,7 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
             logger.log("    $ gls --language Java --tsconfig ./tsconfig ./src/*.ts");
             logger.log();
         })
-        .parse(argv) as ICliProgram;
+        .parse(argv as string[]) as IParsedArguments;
 
     if (command.hasOwnProperty("version")) {
         await printCliVersions(logger);
@@ -70,6 +121,7 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
     }
 
     return mainExecutor({
+        fileSystem,
         files,
         languageName: command.language as string,
         logger: console,

@@ -93,21 +93,34 @@ export class Runner {
      */
     public async run(options: IRunOptions): Promise<IRunResults> {
         const fileResults: IFileResults = {};
+        let failures = 0;
 
         await queueAsyncActions(
             Array.from(options.requestedFiles)
                 .map((fileName) =>
                     async () => {
-                        await this.runOnFile(fileName, options)
-                            .then((result: IConversionResult) => {
-                                fileResults[fileName] = result;
-                            });
-                        }));
+                        const result = await this.runOnFile(fileName, options);
+                        fileResults[fileName] = result;
 
-        this.dependencies.logger.log(
+                        if (result.status === ConversionStatus.Failed) {
+                            failures += 1;
+                        }
+                    }));
+
+        const output = [
             chalk.italic("Ran on"),
             chalk.bold(`${options.requestedFiles.size}`),
-            chalk.italic(`file${options.existingFileContents.size === 1 ? "" : "s"}.`));
+            chalk.italic(`file${options.existingFileContents.size === 1 ? "" : "s"}.`),
+        ];
+
+        if (failures !== 0) {
+            output.push(
+                chalk.bold.red(`${failures}`),
+                chalk.red("failed."),
+            );
+        }
+
+        this.dependencies.logger.log(output.join(" "));
 
         return { fileResults };
     }
@@ -117,9 +130,9 @@ export class Runner {
      *
      * @param filePath   Path to the file.
      * @param options   Options for converting files.
-     * @returns Promise for converting the file.
+     * @returns Promise for results from converting the file.
      */
-    private readonly runOnFile = async (filePath: string, options: IRunOptions) => {
+    private readonly runOnFile = async (filePath: string, options: IRunOptions): Promise<IConversionResult> => {
         this.dependencies.logger.log(
             chalk.grey("Converting"),
             `${filePath}${chalk.grey("...")}`);

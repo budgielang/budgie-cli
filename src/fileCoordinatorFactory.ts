@@ -2,18 +2,18 @@ import { Language } from "general-language-syntax";
 
 import { GlsConverter } from "./converters/gls";
 import { createTypeScriptConverter, tsExtension } from "./converters/typescript";
-import { Coordinator } from "./coordinator";
+import { FileCoordinator } from "./fileCoordinator";
 import { IFileSystem } from "./files";
 import { ILogger } from "./logger";
 
-export interface ICreateCoordinatorDependencies {
+export interface ICreateFileCoordinatorDependencies {
     fileSystem: IFileSystem;
     language: Language;
     logger: ILogger;
 }
 
-export const createCoordinator = (dependencies: ICreateCoordinatorDependencies) =>
-    new Coordinator({
+export const createFileCoordinator = (dependencies: ICreateFileCoordinatorDependencies) =>
+    new FileCoordinator({
         converter: new GlsConverter({
             fileSystem: dependencies.fileSystem,
             language: dependencies.language,

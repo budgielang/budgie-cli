@@ -15,7 +15,7 @@ export interface IGlsConverterDependencies {
     fileSystem: IFileSystem;
 
     /**
-     * Output GLS language.
+     * Output language.
      */
     language: Language;
 }
@@ -52,30 +52,32 @@ export class GlsConverter implements IConverter {
     /**
      * Converts a GLS file to its language output.
      *
-     * @param filePath   Original GLS file path.
+     * @param sourcePath   Original GLS file path.
      * @returns The file's language output.
      */
-    public async convertFile(filePath: string): Promise<IConversionResult> {
+    public async convertFile(sourcePath: string): Promise<IConversionResult> {
         const newExtension = this.dependencies.language.properties.general.extension;
-        const outputPath = replaceFileExtension(filePath, glsExtension, newExtension);
+        const outputPath = replaceFileExtension(sourcePath, glsExtension, newExtension);
 
         try {
             const results = this.gls.convert(
-                (await this.dependencies.fileSystem.readFile(filePath))
+                (await this.dependencies.fileSystem.readFile(sourcePath))
                     .split(/\r\n|\r|\n/g));
 
             await this.dependencies.fileSystem.writeFile(outputPath, results.join(EOL));
 
             return {
                 outputPath,
+                sourcePath,
                 status: ConversionStatus.Succeeded,
             };
         } catch (error) {
             return {
                 error,
+                outputPath,
+                sourcePath,
                 status: ConversionStatus.Failed,
             };
         }
     }
-
 }

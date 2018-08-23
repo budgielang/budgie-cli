@@ -4,29 +4,21 @@ import "mocha";
 import { EOL } from "os";
 
 import { ConversionStatus } from "../lib/converter";
-import { createCoordinator } from "../lib/coordinatorFactory";
-import { IRunOptions } from "../lib/runner";
+import { createFileCoordinator } from "../lib/fileCoordinatorFactory";
 import { IMockFiles, mockFileSystem } from "./mocks/fileSystem";
 import { stubLogger } from "./stubs";
 
-describe("Coordinator", () => {
+describe("FileCoordinator", () => {
     const createTestCoordinator = (languageName: string = "C#", files: IMockFiles = {}) => {
         const fileSystem = mockFileSystem(files);
         const language = new LanguagesBag().getLanguageByName(languageName);
         const logger = stubLogger();
-        const coordinator = createCoordinator({ fileSystem, language, logger });
+        const coordinator = createFileCoordinator({ fileSystem, language, logger });
 
         return { coordinator, fileSystem, language, logger };
     };
 
     const stubTsconfigFileName = "tsconfig.json";
-
-    const stubOptions = (inputFilePath: string): IRunOptions => ({
-        existingFileContents: new Map([
-            [inputFilePath, inputFilePath],
-        ]),
-        typescriptConfig: stubTsconfigFileName,
-    });
 
     describe("convertFile", () => {
         it("converts a GLS file to C#", async () => {
@@ -53,6 +45,7 @@ describe("Coordinator", () => {
             // Assert
             expect(result).to.be.deep.equal({
                 outputPath: outputFilePath,
+                sourcePath: "file.gls",
                 status: ConversionStatus.Succeeded,
             });
             expect(fileSystem.files[outputFilePath]).to.be.equal("// Hello world!");
@@ -82,6 +75,7 @@ describe("Coordinator", () => {
             // Assert
             expect(result).to.be.deep.equal({
                 outputPath: outputFilePath,
+                sourcePath: "file.gls",
                 status: ConversionStatus.Succeeded,
             });
             expect(fileSystem.files[outputFilePath]).to.be.equal([

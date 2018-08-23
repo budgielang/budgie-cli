@@ -3,19 +3,19 @@ import { LanguagesBag } from "general-language-syntax";
 import "mocha";
 import { EOL } from "os";
 
-import { ConversionStatus } from "../lib/converter";
-import { createRunner } from "../lib/runnerFactory";
+import { createRunner } from "../lib/runner/runnerFactory";
 import { IMockFiles, mockFileSystem } from "./mocks/fileSystem";
 import { stubLogger } from "./stubs";
 
 describe("Runner", () => {
-    const createTestRunner = (languageName: string = "C#", files: IMockFiles = {}) => {
+    const createTestRunner = (languageNames: string[] = ["C#"], files: IMockFiles = {}) => {
         const fileSystem = mockFileSystem(files);
-        const language = new LanguagesBag().getLanguageByName(languageName);
+        const languages = languageNames.map(
+            (languageName) => new LanguagesBag().getLanguageByName(languageName));
         const logger = stubLogger();
-        const runner = createRunner({ fileSystem, language, logger });
+        const runner = createRunner({ fileSystem, languages, logger });
 
-        return { runner, fileSystem, language, logger };
+        return { runner, fileSystem, languages, logger };
     };
 
     const stubTsconfigFileName = "tsconfig.json";
@@ -25,64 +25,84 @@ describe("Runner", () => {
             // Arrange
             const inputFilePath = "file.gls";
             const inputFileContents = "comment line : Hello world!";
-            const outputFilePath = "file.cs";
             const { fileSystem, runner } = createTestRunner(
-                "C#",
+                ["C#"],
                 {
                     [inputFilePath]: inputFileContents,
                     [stubTsconfigFileName]: "{}",
                 });
 
             // Act
-            const results = await runner.run({
+            await runner.run({
                 existingFileContents: new Map([
                     [inputFilePath, inputFileContents],
                 ]),
+                requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
 
             // Assert
-            expect(results.fileResults).to.be.deep.equal({
-                [inputFilePath]: {
-                    outputPath: outputFilePath,
-                    status: ConversionStatus.Succeeded,
-                },
+            expect(fileSystem.files).to.contain({
+                "file.cs": "// Hello world!",
             });
-            expect(fileSystem.files[outputFilePath]).to.be.equal("// Hello world!");
+        });
+
+        it("converts a GLS file to multiple languages", async () => {
+            // Arrange
+            const inputFilePath = "file.gls";
+            const inputFileContents = "comment line : Hello world!";
+            const { fileSystem, runner } = createTestRunner(
+                ["C#", "Python"],
+                {
+                    [inputFilePath]: inputFileContents,
+                    [stubTsconfigFileName]: "{}",
+                });
+
+            // Act
+            await runner.run({
+                existingFileContents: new Map([
+                    [inputFilePath, inputFileContents],
+                ]),
+                requestedFiles: new Set([inputFilePath]),
+                typescriptConfig: stubTsconfigFileName,
+            });
+
+            // Assert
+            expect(fileSystem.files).to.contain({
+                "file.cs": "// Hello world!",
+                "file.py": "# Hello world!",
+            });
         });
 
         it("converts a TypeScript file to C#", async () => {
             // Arrange
             const inputFilePath = "file.ts";
             const inputFileContents = 'console.log("Hello world!");';
-            const outputFilePath = "file.cs";
             const { fileSystem, runner } = createTestRunner(
-                "C#",
+                ["C#"],
                 {
                     [inputFilePath]: inputFileContents,
                     [stubTsconfigFileName]: "{}",
                 });
 
             // Act
-            const results = await runner.run({
+            await runner.run({
                 existingFileContents: new Map([
                     [inputFilePath, inputFileContents],
                 ]),
+                requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
 
             // Assert
-            expect(results.fileResults).to.be.deep.equal({
-                [inputFilePath]: {
-                    outputPath: outputFilePath,
-                    status: ConversionStatus.Succeeded,
-                },
+            expect(fileSystem.files).to.contain({
+                "file.cs": [
+                    "using System;",
+                    "",
+                    'Console.WriteLine("Hello world!");',
+                ].join(EOL),
+                "file.gls": 'print : ("Hello world!")',
             });
-            expect(fileSystem.files[outputFilePath]).to.be.equal([
-                "using System;",
-                "",
-                'Console.WriteLine("Hello world!");',
-            ].join(EOL));
         });
     });
 });

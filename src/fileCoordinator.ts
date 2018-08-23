@@ -7,7 +7,7 @@ import { getFileExtension } from "./utils/extensions";
 /**
  * Dependencies to initialize a new instance of the Converter class.
  */
-export interface IConverterDependencies {
+export interface IFileCoordinatorDependencies {
     /**
      * Converts files to their language output(s).
      */
@@ -32,11 +32,11 @@ export interface IConverterDependencies {
 /**
  * Coordinates converting files to their language outputs.
  */
-export class Coordinator {
+export class FileCoordinator {
     /**
      * Dependencies used for initialization.
      */
-    private readonly dependencies: IConverterDependencies;
+    private readonly dependencies: IFileCoordinatorDependencies;
 
     /**
      * Cached converter or error results for each preprocessor creator.
@@ -48,7 +48,7 @@ export class Coordinator {
      *
      * @param dependencies   Dependencies used for initialization.
      */
-    public constructor(dependencies: IConverterDependencies) {
+    public constructor(dependencies: IFileCoordinatorDependencies) {
         this.dependencies = dependencies;
         this.preprocessors = new Map();
     }
@@ -82,6 +82,7 @@ export class Coordinator {
         if (preprocessorCreator === undefined) {
             return {
                 outputPath: filePath,
+                sourcePath: filePath,
                 status: ConversionStatus.Succeeded,
             };
         }
@@ -90,6 +91,8 @@ export class Coordinator {
         if (preprocessor instanceof Error) {
             return {
                 error: preprocessor,
+                outputPath: filePath,
+                sourcePath: filePath,
                 status: ConversionStatus.Failed,
             };
         }

@@ -16,6 +16,11 @@ export enum ExitCode {
  */
 export interface IMainDependencies {
     /**
+     * Base or root directory to ignore from the beginning of file paths, such as "src/", if not "".
+     */
+    baseDirectory?: string;
+
+    /**
      * Unique file paths to convert.
      */
     files: ReadonlySet<string>;
@@ -26,14 +31,19 @@ export interface IMainDependencies {
     fileSystem: IFileSystem;
 
     /**
-     * Name of the GLS language to convert to.
+     * Names of output language(s) to convert to.
      */
-    languageName?: string;
+    languageNames?: ReadonlyArray<string>;
 
     /**
      * Logs information on significant events.
      */
     logger: ILogger;
+
+    /**
+     * Namespace before path names, such as "Gls", if not "".
+     */
+    namespace?: string;
 
     /**
      * TypeScript configuration project, if provided.
@@ -71,43 +81,51 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
         dependencies.logger.log("Available languages:");
 
         for (const languageName of languageNames) {
-            dependencies.logger.log(`\t${languageName}`);
+            dependencies.logger.log(`    ${languageName}`);
         }
     };
 
-    const getLanguageFromName = (languageName?: string): Language | undefined => {
+    const getLanguagesFromNames = (languageNames: ReadonlyArray<string> | undefined): Language[] | undefined => {
         const languagesBag = new LanguagesBag();
-        const languageNames = languagesBag.getLanguageNames();
+        const supportedLanguageNames = languagesBag.getLanguageNames();
 
-        if (languageName === undefined) {
+        if (languageNames === undefined || languageNames.length === 0) {
             dependencies.logger.error("You must provide a -l/--language.");
-            printAvailableLanguages(languageNames);
+            printAvailableLanguages(supportedLanguageNames);
             return undefined;
         }
 
-        if (languageNames.indexOf(languageName) === -1) {
-            dependencies.logger.error(`Unknown language name: '${chalk.bold(languageName)}'.`);
-            printAvailableLanguages(languageNames);
-            return undefined;
+        const languages = [];
+
+        for (const languageName of languageNames) {
+            if (languageNames.indexOf(languageName) === -1) {
+                dependencies.logger.error(`Unknown language name: '${chalk.bold(languageName)}'.`);
+                printAvailableLanguages(languageNames);
+                return undefined;
+            }
+
+            languages.push(languagesBag.getLanguageByName(languageName));
         }
 
-        return languagesBag.getLanguageByName(languageName);
+        return languages;
     };
 
     const run = async (): Promise<number> => {
-        const language = getLanguageFromName(dependencies.languageName);
-        if (language === undefined) {
+        const languages = getLanguagesFromNames(dependencies.languageNames);
+        if (languages === undefined) {
             return ExitCode.Error;
         }
 
         const runner = createRunner({
             fileSystem: dependencies.fileSystem,
-            language,
+            languages,
             logger: dependencies.logger,
         });
 
         await runner.run({
+            baseDirectory: dependencies.baseDirectory,
             existingFileContents: await readFilesFromSystem(dependencies.files, dependencies.fileSystem),
+            outputNamespace: dependencies.namespace,
             requestedFiles: dependencies.files,
             typescriptConfig: dependencies.typescriptConfig,
         });

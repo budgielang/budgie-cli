@@ -1,6 +1,6 @@
 import * as glob from "glob";
 
-import { IConverterDependencies } from "../../coordinator";
+import { IFileCoordinatorDependencies } from "../../fileCoordinator";
 import { IFileSystem } from "../../files";
 import { IRunOptions } from "../../runner/runner";
 import { ITsconfigOptions, TypeScriptConverter } from "./converter";
@@ -28,7 +28,7 @@ const populateFilesCacheForTsconfig = async (
  * @returns Promise for a TypeScript converter or creation error.
  * @remarks This will add to the existing file cache any tsconfig-included files.
  */
-export const createTypeScriptConverter = async (dependencies: IConverterDependencies, options: IRunOptions) => {
+export const createTypeScriptConverter = async (dependencies: IFileCoordinatorDependencies, options: IRunOptions) => {
     const { typescriptConfig } = options;
     if (typescriptConfig === undefined) {
         return new Error("No TypeScript configuration file provided (--tsconfig).");

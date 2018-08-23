@@ -92,7 +92,7 @@ When the CLI is called, the following code paths are used in order:
 1. `Cli`
 2. `Main`
 3. `Runner`
-4. `Coordinator`
+4. `FileCoordinator`
 
 #### `Cli`
 
@@ -121,16 +121,16 @@ Uses an async queue to throttle the number of files that are attempted to be con
 
 See [`runner.ts`](./src/runner/runner.ts) and [`runnerFactory.ts`](./src/runner/runnerFactory.ts`).
 
-#### `Coordinator`
+#### `FileCoordinator`
 
 The driving class behind taking in files and outputting converted `.gls` files.
 Given a file passed to its `convertFile`, it will attempt to convert that file to a `.gls` file by:
 
 1. Preprocessing the file if the file extension requires it
-2. Converting the file using the `Converter`
+2. Converting the file using its `IConverter`
 
 For example, if a `.ts` file is provided, it will attempt to convert it using [TS-GLS[(https://github.com/general-language-syntax/ts-gls) and return the generated `.gls` file path.
 If a `.gls` file path is provided, it will do nothing and pass that path through.
 
-See [`coordinator.ts`](./src/coordinator.ts) and [`coordinatorFactory.ts`](./src/coordinatorFactory).
+See [`fileCoordinator.ts`](./src/fileCoordinator.ts) and [`fileCoordinatorFactory.ts`](./src/coordinatorFactory).
 

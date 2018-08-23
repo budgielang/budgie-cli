@@ -48,14 +48,24 @@ interface IParsedArguments {
     args: ReadonlyArray<string>;
 
     /**
+     * Base or root directory to ignore from the beginning of file paths, such as "src/", if not "".
+     */
+    baseDirectory?: string;
+
+    /**
      * File glob(s) to exclude.
      */
     exclude?: string | ReadonlyArray<string>;
 
     /**
-     * GLS language to convert to.
+     * Output language(s) to convert to.
      */
-    language?: string;
+    language?: string | ReadonlyArray<string>;
+
+    /**
+     * Namespace before path names, such as "Gls", if not "".
+     */
+    namespace?: string;
 
     /**
      * TypeScript configuration project, if provided.
@@ -83,8 +93,10 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
 
     const command = new commander.Command()
         .usage("[options] <file ...> --language [language]")
-        .option("-e, --exclude [exclude]", "file glob(s) to exclude")
-        .option("-l, --language [language]", "language to convert to")
+        .option("-b, --base-directory [base-directory]", "base directory to ignore from the beginning of file paths")
+        .option("-e, --exclude [exclude...]", "file glob(s) to exclude")
+        .option("-l, --language [language...]", "language(s) to convert to")
+        .option("-n, --namespace [namespace]", "namespace before output path names")
         .option("-t, --tsconfig [tsconfig]", "(TypeScript only) configuration project")
         .option("-v, --version", "output the CLI and GLS version numbers")
         .on("--help", (): void => {
@@ -93,14 +105,18 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
             logger.log();
             logger.log("    $ gls --language Python file.gls");
             logger.log();
-            logger.log("  Converting a TypeScript project to GLS, then to Java:");
+            logger.log("  Converting a TypeScript project to GLS, then to Python and Ruby:");
             logger.log();
-            logger.log("    $ gls --language Java --tsconfig ./tsconfig ./src/*.ts");
+            logger.log("    $ gls --language Python --language Ruby --tsconfig ./tsconfig ./*.ts");
+            logger.log();
+            logger.log("  Converting a TypeScript project to GLS, then to C#, replacing the 'src' path with 'Gls':");
+            logger.log();
+            logger.log("    $ gls --base-directory src/ --language C# --namespace Gls --tsconfig ./tsconfig ./*.ts");
             logger.log();
         })
         .parse(argv as string[]) as IParsedArguments;
 
-    if (command.hasOwnProperty("version")) {
+    if ({}.hasOwnProperty.call(command, "version")) {
         await printCliVersions(logger);
         return ExitCode.Ok;
     }
@@ -120,11 +136,17 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         files.delete(exclude);
     }
 
+    const languageNames = command.language !== undefined && typeof command.language === "string"
+        ? [command.language]
+        : command.language;
+
     return mainExecutor({
+        baseDirectory: command.baseDirectory,
         fileSystem,
         files,
-        languageName: command.language as string,
+        languageNames,
         logger: console,
+        namespace: command.namespace,
         typescriptConfig: command.tsconfig,
     });
 };

@@ -1,4 +1,4 @@
-import { IConverterDependencies } from "./coordinator";
+import { IFileCoordinatorDependencies } from "./fileCoordinator";
 import { IRunOptions } from "./runner/runner";
 
 /**
@@ -17,9 +17,24 @@ export enum ConversionStatus {
 }
 
 /**
+ * Common attributes for all conversion results.
+ */
+export interface IConversionResultBase {
+    /**
+     * Would-be path to the output file.
+     */
+    outputPath: string;
+
+    /**
+     * Source path to the original file.
+     */
+    sourcePath: string;
+}
+
+/**
  * Result summary from a failed conversion run.
  */
-export interface IFailedConversionResult {
+export interface IFailedConversionResult extends IConversionResultBase {
     /**
      * Error causing the failure.
      */
@@ -34,12 +49,7 @@ export interface IFailedConversionResult {
 /**
  * Result summary from a successful conversion run.
  */
-export interface ISuccessfulConversionResult {
-    /**
-     * Path to the output file.
-     */
-    outputPath: string;
-
+export interface ISuccessfulConversionResult extends IConversionResultBase {
     /**
      * Success status.
      */
@@ -71,4 +81,4 @@ export interface IConverter {
  * @param options   Options for converting files.
  * @returns Promise for a converter or error.
  */
-export type IConverterCreator = (dependencies: IConverterDependencies, options: IRunOptions) => Promise<IConverter | Error>;
+export type IConverterCreator = (dependencies: IFileCoordinatorDependencies, options: IRunOptions) => Promise<IConverter | Error>;

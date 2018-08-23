@@ -85,6 +85,8 @@ export class TypeScriptConverter implements IConverter {
             options,
             defaultValue(dependencies.tsconfigOptions.compilerOptions.target, () => ts.ScriptTarget.Latest));
         this.transformer = createTransformer({
+            baseDirectory: options.baseDirectory,
+            outputNamespace: options.outputNamespace,
             sourceFiles: Array.from(this.sourceFiles.values()),
         });
     }
@@ -92,15 +94,16 @@ export class TypeScriptConverter implements IConverter {
     /**
      * Converts a TypeScript file to its GLS output.
      *
-     * @param filePath   Original GLS file path.
+     * @param sourcePath   Original GLS file path.
      * @returns The file's GLS output.
      */
-    public async convertFile(filePath: string): Promise<IConversionResult> {
-        const sourceFile = this.sourceFiles.get(filePath);
+    public async convertFile(sourcePath: string): Promise<IConversionResult> {
+        const sourceFile = this.sourceFiles.get(sourcePath);
         if (sourceFile === undefined) {
-            throw new Error(`Unknown source file: '${filePath}'.`);
+            throw new Error(`Unknown source file: '${sourcePath}'.`);
         }
 
+        const outputPath = replaceFileExtension(sourcePath, tsExtension, glsExtension);
         let converted: ReadonlyArray<string>;
 
         try {
@@ -108,15 +111,17 @@ export class TypeScriptConverter implements IConverter {
         } catch (error) {
             return {
                 error,
+                outputPath,
+                sourcePath,
                 status: ConversionStatus.Failed,
             };
         }
 
-        const outputPath = replaceFileExtension(filePath, tsExtension, glsExtension);
         await this.dependencies.fileSystem.writeFile(outputPath, converted.join(EOL));
 
         return {
             outputPath,
+            sourcePath,
             status: ConversionStatus.Succeeded,
         };
     }

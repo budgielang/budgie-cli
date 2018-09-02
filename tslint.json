@@ -1,5 +1,5 @@
 {
-    "extends": ["tslint:all"],
+    "extends": ["tslint:all", "tslint-config-prettier"],
     "rules": {
         "array-type": [true, "array"],
         "comment-format": false,

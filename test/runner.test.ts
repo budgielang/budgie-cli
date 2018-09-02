@@ -10,8 +10,7 @@ import { stubLogger } from "./stubs";
 describe("Runner", () => {
     const createTestRunner = (languageNames: string[] = ["C#"], files: IMockFiles = {}) => {
         const fileSystem = mockFileSystem(files);
-        const languages = languageNames.map(
-            (languageName) => new LanguagesBag().getLanguageByName(languageName));
+        const languages = languageNames.map((languageName) => new LanguagesBag().getLanguageByName(languageName));
         const logger = stubLogger();
         const runner = createRunner({ fileSystem, languages, logger });
 
@@ -25,18 +24,14 @@ describe("Runner", () => {
             // Arrange
             const inputFilePath = "file.gls";
             const inputFileContents = "comment line : Hello world!";
-            const { fileSystem, runner } = createTestRunner(
-                ["C#"],
-                {
-                    [inputFilePath]: inputFileContents,
-                    [stubTsconfigFileName]: "{}",
-                });
+            const { fileSystem, runner } = createTestRunner(["C#"], {
+                [inputFilePath]: inputFileContents,
+                [stubTsconfigFileName]: "{}",
+            });
 
             // Act
             await runner.run({
-                existingFileContents: new Map([
-                    [inputFilePath, inputFileContents],
-                ]),
+                existingFileContents: new Map([[inputFilePath, inputFileContents]]),
                 requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
@@ -51,18 +46,14 @@ describe("Runner", () => {
             // Arrange
             const inputFilePath = "file.gls";
             const inputFileContents = "comment line : Hello world!";
-            const { fileSystem, runner } = createTestRunner(
-                ["C#", "Python"],
-                {
-                    [inputFilePath]: inputFileContents,
-                    [stubTsconfigFileName]: "{}",
-                });
+            const { fileSystem, runner } = createTestRunner(["C#", "Python"], {
+                [inputFilePath]: inputFileContents,
+                [stubTsconfigFileName]: "{}",
+            });
 
             // Act
             await runner.run({
-                existingFileContents: new Map([
-                    [inputFilePath, inputFileContents],
-                ]),
+                existingFileContents: new Map([[inputFilePath, inputFileContents]]),
                 requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
@@ -78,29 +69,21 @@ describe("Runner", () => {
             // Arrange
             const inputFilePath = "file.ts";
             const inputFileContents = 'console.log("Hello world!");';
-            const { fileSystem, runner } = createTestRunner(
-                ["C#"],
-                {
-                    [inputFilePath]: inputFileContents,
-                    [stubTsconfigFileName]: "{}",
-                });
+            const { fileSystem, runner } = createTestRunner(["C#"], {
+                [inputFilePath]: inputFileContents,
+                [stubTsconfigFileName]: "{}",
+            });
 
             // Act
             await runner.run({
-                existingFileContents: new Map([
-                    [inputFilePath, inputFileContents],
-                ]),
+                existingFileContents: new Map([[inputFilePath, inputFileContents]]),
                 requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
 
             // Assert
             expect(fileSystem.files).to.contain({
-                "file.cs": [
-                    "using System;",
-                    "",
-                    'Console.WriteLine("Hello world!");',
-                ].join(EOL),
+                "file.cs": ["using System;", "", 'Console.WriteLine("Hello world!");'].join(EOL),
                 "file.gls": 'print : ("Hello world!")',
             });
         });

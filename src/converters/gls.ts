@@ -60,9 +60,7 @@ export class GlsConverter implements IConverter {
         const outputPath = replaceFileExtension(sourcePath, glsExtension, newExtension);
 
         try {
-            const results = this.gls.convert(
-                (await this.dependencies.fileSystem.readFile(sourcePath))
-                    .split(/\r\n|\r|\n/g));
+            const results = this.gls.convert((await this.dependencies.fileSystem.readFile(sourcePath)).split(/\r\n|\r|\n/g));
 
             await this.dependencies.fileSystem.writeFile(outputPath, results.join(EOL));
 

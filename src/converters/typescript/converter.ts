@@ -83,7 +83,8 @@ export class TypeScriptConverter implements IConverter {
 
         this.sourceFiles = createSourceFilesMap(
             options,
-            defaultValue(dependencies.tsconfigOptions.compilerOptions.target, () => ts.ScriptTarget.Latest));
+            defaultValue(dependencies.tsconfigOptions.compilerOptions.target, () => ts.ScriptTarget.Latest),
+        );
         this.transformer = createTransformer({
             baseDirectory: options.baseDirectory,
             outputNamespace: options.outputNamespace,

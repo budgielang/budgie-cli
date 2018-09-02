@@ -99,21 +99,24 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         .option("-n, --namespace [namespace]", "namespace before output path names")
         .option("-t, --tsconfig [tsconfig]", "(TypeScript only) configuration project")
         .option("-v, --version", "output the CLI and GLS version numbers")
-        .on("--help", (): void => {
-            logger.log();
-            logger.log("  Basic GLS conversion:");
-            logger.log();
-            logger.log("    $ gls --language Python file.gls");
-            logger.log();
-            logger.log("  Converting a TypeScript project to GLS, then to Python and Ruby:");
-            logger.log();
-            logger.log("    $ gls --language Python --language Ruby --tsconfig ./tsconfig ./*.ts");
-            logger.log();
-            logger.log("  Converting a TypeScript project to GLS, then to C#, replacing the 'src' path with 'Gls':");
-            logger.log();
-            logger.log("    $ gls --base-directory src/ --language C# --namespace Gls --tsconfig ./tsconfig ./*.ts");
-            logger.log();
-        })
+        .on(
+            "--help",
+            (): void => {
+                logger.log();
+                logger.log("  Basic GLS conversion:");
+                logger.log();
+                logger.log("    $ gls --language Python file.gls");
+                logger.log();
+                logger.log("  Converting a TypeScript project to GLS, then to Python and Ruby:");
+                logger.log();
+                logger.log("    $ gls --language Python --language Ruby --tsconfig ./tsconfig ./*.ts");
+                logger.log();
+                logger.log("  Converting a TypeScript project to GLS, then to C#, replacing the 'src' path with 'Gls':");
+                logger.log();
+                logger.log("    $ gls --base-directory src/ --language C# --namespace Gls --tsconfig ./tsconfig ./*.ts");
+                logger.log();
+            },
+        )
         .parse(argv as string[]) as IParsedArguments;
 
     if ({}.hasOwnProperty.call(command, "version")) {
@@ -126,19 +129,14 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         return ExitCode.Ok;
     }
 
-    const [includes, excludes] = await Promise.all([
-        globber(command.args),
-        getExcludes(command.exclude, globber),
-    ]);
+    const [includes, excludes] = await Promise.all([globber(command.args), getExcludes(command.exclude, globber)]);
 
     const files = new Set(includes);
     for (const exclude of excludes) {
         files.delete(exclude);
     }
 
-    const languageNames = command.language !== undefined && typeof command.language === "string"
-        ? [command.language]
-        : command.language;
+    const languageNames = command.language !== undefined && typeof command.language === "string" ? [command.language] : command.language;
 
     return mainExecutor({
         baseDirectory: command.baseDirectory,

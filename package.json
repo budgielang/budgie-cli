@@ -1,66 +1,67 @@
 {
-  "name": "gls-cli",
-  "version": "0.2.0",
-  "description": "Node CLI for General Language Syntax (GLS).",
-  "main": "lib/index.js",
-  "bin": {
-    "gls": "bin/gls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/highschoolhacking/gls-cli.git"
-  },
-  "keywords": [
-    "general",
-    "language",
-    "syntax",
-    "gls",
-    "cli"
-  ],
-  "author": "Josh Goldberg <joshuakgoldberg@outlook.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/highschoolhacking/gls-cli/issues"
-  },
-  "homepage": "https://github.com/highschoolhacking/gls-cli#readme",
-  "dependencies": {
-    "chalk": "^2.4.1",
-    "commander": "^2.17.1",
-    "glob": "^7.1.2",
-    "minimatch": "^3.0.4",
-    "mz": "^2.7.0"
-  },
-  "devDependencies": {
-    "@types/chai": "^4.1.4",
-    "@types/chalk": "^2.2.0",
-    "@types/commander": "^2.12.2",
-    "@types/glob": "^5.0.35",
-    "@types/minimatch": "^3.0.3",
-    "@types/mocha": "^5.2.5",
-    "@types/mz": "0.0.32",
-    "@types/node": "^10.7.1",
-    "@types/sinon": "^5.0.1",
-    "@types/sinon-chai": "^3.2.0",
-    "chai": "^4.1.2",
-    "del": "^3.0.0",
-    "mocha": "^5.2.0",
-    "sinon": "^6.1.5",
-    "sinon-chai": "^3.2.0",
-    "tslint": "5.11.0"
-  },
-  "peerDependencies": {
-    "general-language-syntax": "^0.3.22",
-    "ts-gls": "^0.2.0",
-    "typescript": "^3.0.1"
-  },
-  "scripts": {
-    "src": "npm run src:tsc && npm run src:tslint",
-    "src:tsc": "tsc",
-    "src:tslint": "tslint -c tslint.json -p tsconfig.json -t stylish",
-    "test": "npm run test:tsc && npm run test:tslint && npm run test:run",
-    "test:tsc": "tsc -p test",
-    "test:tslint": "tslint -c tslint.json -p test/tsconfig.json -t stylish",
-    "test:run": "mocha test/*.js test/**/*.js",
-    "verify": "npm run src && npm run test"
-  }
+    "name": "gls-cli",
+    "version": "0.2.0",
+    "description": "Node CLI for General Language Syntax (GLS).",
+    "main": "lib/index.js",
+    "bin": {
+        "gls": "bin/gls"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/highschoolhacking/gls-cli.git"
+    },
+    "keywords": ["general", "language", "syntax", "gls", "cli"],
+    "author": "Josh Goldberg <joshuakgoldberg@outlook.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/highschoolhacking/gls-cli/issues"
+    },
+    "homepage": "https://github.com/highschoolhacking/gls-cli#readme",
+    "dependencies": {
+        "chalk": "^2.4.1",
+        "commander": "^2.17.1",
+        "glob": "^7.1.2",
+        "minimatch": "^3.0.4",
+        "mz": "^2.7.0"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.1.4",
+        "@types/chalk": "^2.2.0",
+        "@types/commander": "^2.12.2",
+        "@types/glob": "^5.0.35",
+        "@types/minimatch": "^3.0.3",
+        "@types/mocha": "^5.2.5",
+        "@types/mz": "0.0.32",
+        "@types/node": "^10.7.1",
+        "@types/sinon": "^5.0.1",
+        "@types/sinon-chai": "^3.2.0",
+        "chai": "^4.1.2",
+        "del": "^3.0.0",
+        "husky": "^0.14.3",
+        "mocha": "^5.2.0",
+        "prettier": "^1.14.2",
+        "pretty-quick": "^1.6.0",
+        "sinon": "^6.1.5",
+        "sinon-chai": "^3.2.0",
+        "tslint": "5.11.0",
+        "tslint-config-prettier": "^1.15.0"
+    },
+    "peerDependencies": {
+        "general-language-syntax": "^0.3.22",
+        "ts-gls": "^0.2.0",
+        "typescript": "^3.0.1"
+    },
+    "scripts": {
+        "precommit": "pretty-quick --staged --write",
+        "prettier:write": "prettier --config .prettierrc.json --write",
+        "prettier:write:all": "npm run prettier:write ./{src,test}/**/*.{json,ts}",
+        "src": "npm run src:tsc && npm run src:tslint",
+        "src:tsc": "tsc",
+        "src:tslint": "tslint -c tslint.json -p tsconfig.json -t stylish",
+        "test": "npm run test:tsc && npm run test:tslint && npm run test:run",
+        "test:tsc": "tsc -p test",
+        "test:tslint": "tslint -c tslint.json -p test/tsconfig.json -t stylish",
+        "test:run": "mocha test/*.js test/**/*.js",
+        "verify": "npm run src && npm run test"
+    }
 }

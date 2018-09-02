@@ -9,16 +9,14 @@ use(sinonChai);
 
 describe("asyncQueue", () => {
     describe("queueAsyncActions", () => {
-        const neverEndingPromise = new Promise<void>(() => {/* ... */});
+        const neverEndingPromise = new Promise<void>(() => {
+            /* ... */
+        });
 
         // tslint:disable no-unused-expression no-floating-promises
         it("immediately calls the limited number of creators", async () => {
             // Arrange
-            const creators = [
-                stub().returns(neverEndingPromise),
-                stub().returns(neverEndingPromise),
-                stub().returns(neverEndingPromise),
-            ];
+            const creators = [stub().returns(neverEndingPromise), stub().returns(neverEndingPromise), stub().returns(neverEndingPromise)];
 
             // Act
             queueAsyncActions(creators, creators.length);
@@ -32,11 +30,7 @@ describe("asyncQueue", () => {
 
         it("doesn't immediately call a creator past the limit", async () => {
             // Arrange
-            const creators = [
-                stub().returns(neverEndingPromise),
-                stub().returns(neverEndingPromise),
-                stub().returns(neverEndingPromise),
-            ];
+            const creators = [stub().returns(neverEndingPromise), stub().returns(neverEndingPromise), stub().returns(neverEndingPromise)];
 
             // Act
             queueAsyncActions(creators, creators.length - 1);
@@ -47,11 +41,7 @@ describe("asyncQueue", () => {
 
         it("calls a next creator when the first creator finishes", async () => {
             // Arrange
-            const creators = [
-                stub().returns(Promise.resolve()),
-                stub().returns(neverEndingPromise),
-                stub().returns(neverEndingPromise),
-            ];
+            const creators = [stub().returns(Promise.resolve()), stub().returns(neverEndingPromise), stub().returns(neverEndingPromise)];
 
             // Act
             queueAsyncActions(creators, creators.length - 1);
@@ -63,11 +53,7 @@ describe("asyncQueue", () => {
 
         it("calls a second next creator when two have finished", async () => {
             // Arrange
-            const creators = [
-                stub().returns(Promise.resolve()),
-                stub().returns(Promise.resolve()),
-                stub().returns(neverEndingPromise),
-            ];
+            const creators = [stub().returns(Promise.resolve()), stub().returns(Promise.resolve()), stub().returns(neverEndingPromise)];
 
             // Act
             queueAsyncActions(creators, creators.length - 2);
@@ -80,11 +66,7 @@ describe("asyncQueue", () => {
 
         it("resolved when all limited and extra creators finish", async () => {
             // Arrange
-            const creators = [
-                stub().returns(Promise.resolve()),
-                stub().returns(Promise.resolve()),
-                stub().returns(Promise.resolve()),
-            ];
+            const creators = [stub().returns(Promise.resolve()), stub().returns(Promise.resolve()), stub().returns(Promise.resolve())];
 
             // Act
             await queueAsyncActions(creators, creators.length - 1);

@@ -20,7 +20,5 @@ export const createFileCoordinator = (dependencies: ICreateFileCoordinatorDepend
         }),
         fileSystem: dependencies.fileSystem,
         logger: console,
-        preprocessors: new Map([
-            [tsExtension, createTypeScriptConverter],
-        ]),
+        preprocessors: new Map([[tsExtension, createTypeScriptConverter]]),
     });

@@ -10,20 +10,19 @@ interface IGlobExpansions {
 }
 
 describe("CLI", () => {
-    const stubGlobber = (globExpansions: IGlobExpansions) =>
-        async (patterns: ReadonlyArray<string>) => {
-            const results = [];
+    const stubGlobber = (globExpansions: IGlobExpansions) => async (patterns: ReadonlyArray<string>) => {
+        const results = [];
 
-            for (const pattern of patterns) {
-                if (pattern in globExpansions) {
-                    results.push(...globExpansions[pattern]);
-                } else {
-                    throw new Error(`Unknown glob pattern: '${pattern}'.`);
-                }
+        for (const pattern of patterns) {
+            if (pattern in globExpansions) {
+                results.push(...globExpansions[pattern]);
+            } else {
+                throw new Error(`Unknown glob pattern: '${pattern}'.`);
             }
+        }
 
-            return results;
-        };
+        return results;
+    };
 
     const stubMainDependencies = (
         extraArgv: ReadonlyArray<string>,
@@ -44,10 +43,9 @@ describe("CLI", () => {
     describe("version", () => {
         it("doesn't crash and burn", async () => {
             // Arrange
-            const dependencies = stubMainDependencies(
-                ["--version"],
-                {},
-                () => {/* ... */});
+            const dependencies = stubMainDependencies(["--version"], {}, () => {
+                /* ... */
+            });
 
             // Act
             await cli(dependencies);
@@ -68,7 +66,8 @@ describe("CLI", () => {
                     const actualFiles = Array.from(mainArgs.files);
 
                     expect(actualFiles).to.be.deep.equal([stubFileName]);
-                });
+                },
+            );
 
             // Act
             await cli(dependencies);
@@ -88,7 +87,8 @@ describe("CLI", () => {
                     const actualFiles = Array.from(mainArgs.files);
 
                     expect(actualFiles).to.be.deep.equal(stubFileNames);
-                });
+                },
+            );
 
             // Act
             await cli(dependencies);
@@ -110,7 +110,8 @@ describe("CLI", () => {
                     const actualFiles = Array.from(mainArgs.files);
 
                     expect(actualFiles).to.be.deep.equal([stubFileNames[1]]);
-                });
+                },
+            );
 
             // Act
             await cli(dependencies);

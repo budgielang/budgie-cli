@@ -17,7 +17,6 @@ const populateFilesCacheForTsconfig = async (
             }
         }
     }
-
 };
 
 /**
@@ -48,7 +47,7 @@ export const createTypeScriptConverter = async (dependencies: IFileCoordinatorDe
         optionsParsed = {
             compilerOptions: {},
             include: [],
-            ...JSON.parse(optionsRaw) as Partial<ITsconfigOptions>,
+            ...(JSON.parse(optionsRaw) as Partial<ITsconfigOptions>),
         };
     } catch (error) {
         dependencies.logger.error(`Could not parse '${typescriptConfig}'.`);
@@ -62,5 +61,6 @@ export const createTypeScriptConverter = async (dependencies: IFileCoordinatorDe
             fileSystem: dependencies.fileSystem,
             tsconfigOptions: optionsParsed,
         },
-        options);
+        options,
+    );
 };

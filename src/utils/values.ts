@@ -7,6 +7,4 @@
  * @returns Value or generated default.
  */
 export const defaultValue = <TValue>(value: TValue | undefined, defaultValueCreator: () => TValue): TValue =>
-    value === undefined
-        ? defaultValueCreator()
-        : value;
+    value === undefined ? defaultValueCreator() : value;

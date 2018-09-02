@@ -103,15 +103,16 @@ export class Runner {
         const failures: IFailedConversionResult[] = [];
         const successes: ISuccessfulConversionResult[] = [];
 
-        await queueAsyncActions(
-            Array.from(options.requestedFiles)
-                .map((fileName) =>
-                    async () => {
-                        const result = await this.runOnFile(fileName, options);
+        this.dependencies.logger.log(`Starting conversion on ${options.requestedFiles.size} files...`);
 
-                        failures.push(...result.failures);
-                        successes.push(...result.successes);
-                    }));
+        await queueAsyncActions(
+            Array.from(options.requestedFiles).map((fileName) => async () => {
+                const result = await this.runOnFile(fileName, options);
+
+                failures.push(...result.failures);
+                successes.push(...result.successes);
+            }),
+        );
 
         const output = [
             chalk.italic("Ran"),
@@ -147,12 +148,11 @@ export class Runner {
      * @returns Promise for results from converting the file.
      */
     private readonly runOnFile = async (filePath: string, options: IRunOptions): Promise<IFileRunResults> => {
-        this.dependencies.logger.log(
-            chalk.grey("Converting"),
-            `${filePath}${chalk.grey("...")}`);
+        this.dependencies.logger.log(chalk.grey("Converting"), `${filePath}${chalk.grey("...")}`);
 
-        const results = await Promise.all(this.dependencies.coordinators
-            .map(async (coordinator) => coordinator.convertFile(filePath, options)));
+        const results = await Promise.all(
+            this.dependencies.coordinators.map(async (coordinator) => coordinator.convertFile(filePath, options)),
+        );
         const failures: IFailedConversionResult[] = [];
         const successes: ISuccessfulConversionResult[] = [];
 
@@ -166,17 +166,19 @@ export class Runner {
                         chalk.grey.italic(":"),
                         EOL,
                         indent(chalk.italic.red(result.error.stack === undefined ? result.error.message : result.error.stack)),
-                    ].join(""));
+                    ].join(""),
+                );
             } else {
                 successes.push(result);
                 this.dependencies.logger.log(
                     chalk.italic.grey("Converted"),
                     chalk.bold.green(filePath),
                     chalk.italic.grey("to"),
-                    chalk.bold.green(result.outputPath));
+                    chalk.bold.green(result.outputPath),
+                );
             }
         }
 
         return { failures, successes };
-    }
+    };
 }

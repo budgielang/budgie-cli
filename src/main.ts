@@ -62,11 +62,10 @@ const readFilesFromSystem = async (filePaths: ReadonlySet<string>, fileSystem: I
     const map = new Map<string, string>();
 
     await queueAsyncActions(
-        Array.from(filePaths)
-            .map((filePath: string) =>
-                async () => {
-                    map.set(filePath, await fileSystem.readFile(filePath));
-                }));
+        Array.from(filePaths).map((filePath: string) => async () => {
+            map.set(filePath, await fileSystem.readFile(filePath));
+        }),
+    );
 
     return map;
 };

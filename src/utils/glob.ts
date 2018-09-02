@@ -15,9 +15,10 @@ export const globAsync = async (pattern: string, options: glob.IOptions = {}): P
     });
 
 export const globAllAsync = async (patterns: ReadonlyArray<string>, options: glob.IOptions = {}) =>
-    (await Promise
-        .all(patterns.map(async (pattern: string) => globAsync(pattern, options))))
-        .reduce((allResults: ReadonlyArray<string>, nextResults: ReadonlyArray<string>) => allResults.concat(nextResults), []);
+    (await Promise.all(patterns.map(async (pattern: string) => globAsync(pattern, options)))).reduce(
+        (allResults: ReadonlyArray<string>, nextResults: ReadonlyArray<string>) => allResults.concat(nextResults),
+        [],
+    );
 
 export type IGlobAsync = typeof globAsync;
 

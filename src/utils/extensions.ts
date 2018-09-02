@@ -4,8 +4,7 @@
  * @param filePath   Original file path.
  * @returns Extension from the file, including preceding period.
  */
-export const getFileExtension = (filePath: string) =>
-    filePath.substring(filePath.lastIndexOf("."));
+export const getFileExtension = (filePath: string) => filePath.substring(filePath.lastIndexOf("."));
 
 /**
  * Replaces a file's extension.

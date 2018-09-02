@@ -13,12 +13,13 @@ export interface ICreateRunnerDependencies {
 
 export const createRunner = (dependencies: ICreateRunnerDependencies) =>
     new Runner({
-        coordinators: dependencies.languages
-            .map((language) => createFileCoordinator({
+        coordinators: dependencies.languages.map((language) =>
+            createFileCoordinator({
                 fileSystem: dependencies.fileSystem,
                 language,
                 logger: dependencies.logger,
-            })),
+            }),
+        ),
         fileSystem: dependencies.fileSystem,
         logger: dependencies.logger,
     });

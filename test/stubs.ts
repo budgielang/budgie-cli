@@ -8,7 +8,8 @@ export const stubFileSystem = (): IFileSystem => ({
     writeFile: stub(),
 });
 
-export const stubLogger = (): ILogger => ({
-    error: stub(),
-    log: stub(),
-} as any); // tslint:disable-line no-any
+export const stubLogger = (): ILogger =>
+    ({
+        error: stub(),
+        log: stub(),
+    } as any); // tslint:disable-line no-any

@@ -26,18 +26,14 @@ describe("FileCoordinator", () => {
             const inputFilePath = "file.gls";
             const inputFileContents = "comment line : Hello world!";
             const outputFilePath = "file.cs";
-            const { coordinator, fileSystem } = createTestCoordinator(
-                "C#",
-                {
-                    [inputFilePath]: inputFileContents,
-                    [stubTsconfigFileName]: "{}",
-                });
+            const { coordinator, fileSystem } = createTestCoordinator("C#", {
+                [inputFilePath]: inputFileContents,
+                [stubTsconfigFileName]: "{}",
+            });
 
             // Act
             const result = await coordinator.convertFile(inputFilePath, {
-                existingFileContents: new Map([
-                    [inputFilePath, inputFileContents],
-                ]),
+                existingFileContents: new Map([[inputFilePath, inputFileContents]]),
                 requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
@@ -56,18 +52,14 @@ describe("FileCoordinator", () => {
             const inputFilePath = "file.ts";
             const inputFileContents = 'console.log("Hello world!");';
             const outputFilePath = "file.cs";
-            const { coordinator, fileSystem } = createTestCoordinator(
-                "C#",
-                {
-                    [inputFilePath]: inputFileContents,
-                    [stubTsconfigFileName]: "{}",
-                });
+            const { coordinator, fileSystem } = createTestCoordinator("C#", {
+                [inputFilePath]: inputFileContents,
+                [stubTsconfigFileName]: "{}",
+            });
 
             // Act
             const result = await coordinator.convertFile(inputFilePath, {
-                existingFileContents: new Map([
-                    [inputFilePath, inputFileContents],
-                ]),
+                existingFileContents: new Map([[inputFilePath, inputFileContents]]),
                 requestedFiles: new Set([inputFilePath]),
                 typescriptConfig: stubTsconfigFileName,
             });
@@ -78,11 +70,7 @@ describe("FileCoordinator", () => {
                 sourcePath: "file.gls",
                 status: ConversionStatus.Succeeded,
             });
-            expect(fileSystem.files[outputFilePath]).to.be.equal([
-                "using System;",
-                "",
-                'Console.WriteLine("Hello world!");',
-            ].join(EOL));
+            expect(fileSystem.files[outputFilePath]).to.be.equal(["using System;", "", 'Console.WriteLine("Hello world!");'].join(EOL));
         });
     });
 });

@@ -48,7 +48,7 @@
     },
     "peerDependencies": {
         "general-language-syntax": "^0.3.22",
-        "ts-gls": "^0.2.0",
+        "ts-gls": "^0.3.0",
         "typescript": "^3.0.1"
     },
     "scripts": {

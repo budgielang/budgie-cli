@@ -11,6 +11,8 @@
         "no-implicit-dependencies": [true, "dev"],
         "no-import-side-effect": false,
         "no-magic-numbers": [true, -1, 0, 1, 2, 3],
+        "no-parameter-properties": false,
+        "no-parameter-reassignment": false,
         "no-submodule-imports": false,
         "no-unsafe-any": false,
         "no-unused-variable": false,

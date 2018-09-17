@@ -1,8 +1,9 @@
 import * as commander from "commander";
 
-import { FileSystem, IFileSystem } from "../files";
+import { ExitCode } from "../codes";
+import { FileSystem, IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";
-import { ExitCode, IMain, main } from "../main";
+import { IMain, main } from "../main";
 import { globAllAsync, IGlobAllAsync } from "../utils/glob";
 import { defaultValue } from "../utils/values";
 import { getExcludes } from "./exclude";
@@ -131,17 +132,17 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
 
     const [includes, excludes] = await Promise.all([globber(command.args), getExcludes(command.exclude, globber)]);
 
-    const files = new Set(includes);
+    const filePaths = new Set(includes);
     for (const exclude of excludes) {
-        files.delete(exclude);
+        filePaths.delete(exclude);
     }
 
     const languageNames = command.language !== undefined && typeof command.language === "string" ? [command.language] : command.language;
 
     return mainExecutor({
         baseDirectory: command.baseDirectory,
+        filePaths,
         fileSystem,
-        files,
         languageNames,
         logger: console,
         namespace: command.namespace,

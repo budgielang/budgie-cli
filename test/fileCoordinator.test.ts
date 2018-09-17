@@ -3,8 +3,7 @@ import { LanguagesBag } from "general-language-syntax";
 import "mocha";
 import { EOL } from "os";
 
-import { ConversionStatus } from "../lib/converter";
-import { createFileCoordinator } from "../lib/fileCoordinatorFactory";
+import { ConversionStatus } from "../lib/conversions/converter";
 import { IMockFiles, mockFileSystem } from "./mocks/fileSystem";
 import { stubLogger } from "./stubs";
 

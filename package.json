@@ -10,7 +10,13 @@
         "type": "git",
         "url": "git+https://github.com/highschoolhacking/gls-cli.git"
     },
-    "keywords": ["general", "language", "syntax", "gls", "cli"],
+    "keywords": [
+        "general",
+        "language",
+        "syntax",
+        "gls",
+        "cli"
+    ],
     "author": "Josh Goldberg <joshuakgoldberg@outlook.com>",
     "license": "MIT",
     "bugs": {

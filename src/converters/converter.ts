@@ -1,5 +1,5 @@
-import { IFileCoordinatorDependencies } from "./fileCoordinator";
-import { IRunOptions } from "./runner/runner";
+import { IFileSystem } from "../fileSystem";
+import { ILogger } from "../logger";
 
 /**
  * Status from a conversion attempt.
@@ -75,10 +75,46 @@ export interface IConverter {
 }
 
 /**
- * Asynchronously creates a converter.
+ * Dependencies to create a new language converter.
+ */
+export interface ICreateConverterDependencies {
+    /**
+     * Base or root directory to ignore from the beginning of file paths, such as "src/", if not "".
+     */
+    baseDirectory?: string;
+
+    /**
+     * Writable cache of contents of file paths, keyed by unique file name.
+     *
+     * @remarks This may be added to by converters as they need more files.
+     */
+    existingFileContents: Map<string, string>;
+
+    /**
+     * Reads and writes files.
+     */
+    fileSystem: IFileSystem;
+
+    /**
+     * Logs information on significant events.
+     */
+    logger: ILogger;
+
+    /**
+     * Namespace before path names, such as "Gls", if not "".
+     */
+    outputNamespace?: string;
+
+    /**
+     * TypeScript configuration project file path, if provided.
+     */
+    typescriptConfig?: string;
+}
+
+/**
+ * Asynchronously attempts to creates a converter.
  *
  * @param dependencies   Dependencies to create the converter.
- * @param options   Options for converting files.
- * @returns Promise for a converter or error.
+ * @returns Promise for a converter or creation error.
  */
-export type IConverterCreator = (dependencies: IFileCoordinatorDependencies, options: IRunOptions) => Promise<IConverter | Error>;
+export type IConverterCreator = (converterDependencies: ICreateConverterDependencies) => Promise<IConverter | Error>;

@@ -91,8 +91,10 @@ When the CLI is called, the following code paths are used in order:
 
 1. `Cli`
 2. `Main`
-3. `Runner`
-4. `FileCoordinator`
+3. `Preprocess`
+4. `Runner`
+5. `Postprocess`
+6. `FileCoordinator`
 
 #### `Cli`
 
@@ -105,13 +107,19 @@ See [`cli.ts`](./src/cli/cli.ts).
 
 #### `Main`
 
-Validates GLS settings, sets up a conversion `Runner`, and runs it.
+Validates GLS settings, sets up the conversion's `Preprocess`, `Runner`, and `Postprocess`, then runs them in that order.
 There are two real behaviors here not covered by the `Cli`:
 
 * Globbing file paths passed as glob args and reading them the file system.
 * Validating the provided language is known by GLS.
 
 See [`main.ts`](./src/main.ts).
+
+#### `Preprocess`
+
+
+
+See [`preprocess.ts`](./src/conversions/preprocess.ts).
 
 #### `Runner`
 
@@ -121,7 +129,7 @@ Uses an async queue to throttle the number of files that are attempted to be con
 
 See [`runner.ts`](./src/runner/runner.ts) and [`runnerFactory.ts`](./src/runner/runnerFactory.ts`).
 
-#### `FileCoordinator`
+##### `FileCoordinator`
 
 The driving class behind taking in files and outputting converted `.gls` files.
 Given a file passed to its `convertFile`, it will attempt to convert that file to a `.gls` file by:
@@ -129,8 +137,11 @@ Given a file passed to its `convertFile`, it will attempt to convert that file t
 1. Preprocessing the file if the file extension requires it
 2. Converting the file using its `IConverter`
 
-For example, if a `.ts` file is provided, it will attempt to convert it using [TS-GLS[(https://github.com/general-language-syntax/ts-gls) and return the generated `.gls` file path.
+For example, if a `.ts` file is provided, it will attempt to convert it using [TS-GLS](https://github.com/general-language-syntax/ts-gls) and return the generated `.gls` file path.
 If a `.gls` file path is provided, it will do nothing and pass that path through.
 
 See [`fileCoordinator.ts`](./src/fileCoordinator.ts) and [`fileCoordinatorFactory.ts`](./src/coordinatorFactory).
 
+#### `Postprocess`
+
+...

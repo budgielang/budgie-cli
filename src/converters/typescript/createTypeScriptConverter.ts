@@ -1,9 +1,8 @@
 import * as glob from "glob";
 
-import { IFileCoordinatorDependencies } from "../../fileCoordinator";
-import { IFileSystem } from "../../files";
-import { IRunOptions } from "../../runner/runner";
-import { ITsconfigOptions, TypeScriptConverter } from "./converter";
+import { IFileSystem } from "../../fileSystem";
+import { IConverter, ICreateConverterDependencies } from "../converter";
+import { ITsconfigOptions, TypeScriptConverter } from "./typescriptConverter";
 
 const populateFilesCacheForTsconfig = async (
     existingFileContents: Map<string, string>,
@@ -23,12 +22,11 @@ const populateFilesCacheForTsconfig = async (
  * Creates a TypeScript converter.
  *
  * @param dependencies   Dependencies to create the converter.
- * @param options   Options for converting files.
- * @returns Promise for a TypeScript converter or creation error.
+ * @returns Promise for a TypeScript converter, if it could be created.
  * @remarks This will add to the existing file cache any tsconfig-included files.
  */
-export const createTypeScriptConverter = async (dependencies: IFileCoordinatorDependencies, options: IRunOptions) => {
-    const { typescriptConfig } = options;
+export const createTypeScriptConverter = async (dependencies: ICreateConverterDependencies): Promise<Error | IConverter> => {
+    const { typescriptConfig } = dependencies;
     if (typescriptConfig === undefined) {
         return new Error("No TypeScript configuration file provided (--tsconfig).");
     }
@@ -39,8 +37,7 @@ export const createTypeScriptConverter = async (dependencies: IFileCoordinatorDe
     try {
         optionsRaw = await dependencies.fileSystem.readFile(typescriptConfig);
     } catch (error) {
-        dependencies.logger.error(`Could not read '${typescriptConfig}'.`);
-        throw error;
+        return new Error(`Could not read '${typescriptConfig}: ${error}'.`);
     }
 
     try {
@@ -50,17 +47,13 @@ export const createTypeScriptConverter = async (dependencies: IFileCoordinatorDe
             ...(JSON.parse(optionsRaw) as Partial<ITsconfigOptions>),
         };
     } catch (error) {
-        dependencies.logger.error(`Could not parse '${typescriptConfig}'.`);
-        throw error;
+        return new Error(`Could not parse '${typescriptConfig}: ${error}'.`);
     }
 
-    await populateFilesCacheForTsconfig(options.existingFileContents, dependencies.fileSystem, optionsParsed);
+    await populateFilesCacheForTsconfig(dependencies.existingFileContents, dependencies.fileSystem, optionsParsed);
 
-    return new TypeScriptConverter(
-        {
-            fileSystem: dependencies.fileSystem,
-            tsconfigOptions: optionsParsed,
-        },
-        options,
-    );
+    return new TypeScriptConverter({
+        ...dependencies,
+        tsconfigOptions: optionsParsed,
+    });
 };

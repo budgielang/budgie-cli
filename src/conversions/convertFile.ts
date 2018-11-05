@@ -1,9 +1,6 @@
-import chalk from "chalk";
-import { EOL } from "os";
-
 import { ConversionStatus, IFailedConversionResult, ISuccessfulConversionResult } from "../converters/converter";
-import { GlsConverter } from "../converters/gls";
-import { indent } from "../utils/text";
+import { GlsConverter } from "../converters/glsConverter";
+import { printActionResult } from "../utils/printing";
 import { IRunDependencies } from "./convertFiles";
 
 /**
@@ -34,31 +31,18 @@ export const convertFile = async (
     filePath: string,
 ): Promise<IFileRunResults> => {
     const results = await Promise.all(
-        glsConverters.map(async (glsConveter) => glsConveter.convertFile(filePath)),
+        glsConverters.map(async (glsConverter) => glsConverter.convertFile(filePath)),
     );
     const failures: IFailedConversionResult[] = [];
     const successes: ISuccessfulConversionResult[] = [];
 
     for (const result of results) {
+        printActionResult(dependencies.logger, filePath, "Converted", "converting", result);
+        
         if (result.status === ConversionStatus.Failed) {
             failures.push(result);
-            dependencies.logger.error(
-                chalk.grey.italic("Failed converting"),
-                [
-                    chalk.red.bold(filePath),
-                    chalk.grey.italic(":"),
-                    EOL,
-                    indent(chalk.italic.red(result.error.stack === undefined ? result.error.message : result.error.stack)),
-                ].join(""),
-            );
         } else {
-            successes.push(result as ISuccessfulConversionResult); // why??
-            dependencies.logger.log(
-                chalk.italic.grey("Converted"),
-                chalk.bold.green(filePath),
-                chalk.italic.grey("to"),
-                chalk.bold.green(result.outputPath),
-            );
+            successes.push(result);
         }
     }
 

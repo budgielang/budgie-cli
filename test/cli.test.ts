@@ -2,7 +2,8 @@ import { expect } from "chai";
 import "mocha";
 
 import { cli } from "../lib/cli/cli";
-import { ExitCode, IMainDependencies } from "../lib/main";
+import { ExitCode } from "../lib/codes";
+import { IMainDependencies } from "../lib/main";
 import { stubLogger } from "./stubs";
 
 interface IGlobExpansions {
@@ -63,7 +64,7 @@ describe("CLI", () => {
                 },
                 (mainArgs: IMainDependencies) => {
                     // Assert
-                    const actualFiles = Array.from(mainArgs.files);
+                    const actualFiles = Array.from(mainArgs.filePaths);
 
                     expect(actualFiles).to.be.deep.equal([stubFileName]);
                 },
@@ -84,7 +85,7 @@ describe("CLI", () => {
                 },
                 (mainArgs: IMainDependencies) => {
                     // Assert
-                    const actualFiles = Array.from(mainArgs.files);
+                    const actualFiles = Array.from(mainArgs.filePaths);
 
                     expect(actualFiles).to.be.deep.equal(stubFileNames);
                 },
@@ -107,7 +108,7 @@ describe("CLI", () => {
                 },
                 (mainArgs: IMainDependencies) => {
                     // Assert
-                    const actualFiles = Array.from(mainArgs.files);
+                    const actualFiles = Array.from(mainArgs.filePaths);
 
                     expect(actualFiles).to.be.deep.equal([stubFileNames[1]]);
                 },

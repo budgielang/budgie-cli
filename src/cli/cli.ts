@@ -2,7 +2,7 @@ import * as commander from "commander";
 
 import { ExitCode } from "../codes";
 import { FileSystem, IFileSystem } from "../fileSystem";
-import { ILogger } from "../logger";
+import { ILogger, parseVerbosity, wrapLoggerForVerbosity } from "../logger";
 import { IMain, main } from "../main";
 import { globAllAsync, IGlobAllAsync } from "../utils/glob";
 import { defaultValue } from "../utils/values";
@@ -64,6 +64,11 @@ interface IParsedArguments {
     language?: string | ReadonlyArray<string>;
 
     /**
+     * GLS configuration project, if provided.
+     */
+    project?: string;
+
+    /**
      * Namespace before path names, such as "Gls", if not "".
      */
     namespace?: string;
@@ -72,6 +77,11 @@ interface IParsedArguments {
      * TypeScript configuration project, if provided.
      */
     tsconfig?: string;
+
+    /**
+     * Minimum importance level of logs to print.
+     */
+    verbosity?: string;
 
     /**
      * Displays help text via the logger.
@@ -97,9 +107,11 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         .option("-b, --base-directory [base-directory]", "base directory to ignore from the beginning of file paths")
         .option("-e, --exclude [exclude...]", "file glob(s) to exclude")
         .option("-l, --language [language...]", "language(s) to convert to")
+        .option("-l, --project [project]", "gls.json project metadata file")
         .option("-n, --namespace [namespace]", "namespace before output path names")
         .option("-t, --tsconfig [tsconfig]", "(TypeScript only) configuration project")
-        .option("-v, --version", "output the CLI and GLS version numbers")
+        .option("-v, --verbosity [verbosity]", `Minimum logged verbosity level: "error" (default) or "log"`)
+        .option("-V, --version", "output the CLI and GLS version numbers")
         .on(
             "--help",
             (): void => {
@@ -137,15 +149,30 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         filePaths.delete(exclude);
     }
 
-    const languageNames = command.language !== undefined && typeof command.language === "string" ? [command.language] : command.language;
+    const languageNames = command.language !== undefined && typeof command.language === "string"
+        ? [command.language]
+        : command.language;
+
+    const project = command.project === "false"
+        ? undefined
+        : command.project === undefined
+            ? "gls.json"
+            : command.project;
+
+    const verbosity = parseVerbosity(command.verbosity);
+    if (verbosity === undefined) {
+        logger.error(`Unknown verbosity requested: '${command.verbosity}'.`);
+        return ExitCode.Error;
+    }
 
     return mainExecutor({
         baseDirectory: command.baseDirectory,
         filePaths,
         fileSystem,
         languageNames,
-        logger: console,
+        logger: wrapLoggerForVerbosity(logger, verbosity),
         namespace: command.namespace,
+        project,
         typescriptConfig: command.tsconfig,
     });
 };

@@ -1,7 +1,7 @@
 import { Language } from "general-language-syntax";
 
 import { ConversionStatus, IFailedConversionResult, ISuccessfulConversionResult } from "../converters/converter";
-import { GlsConverter } from "../converters/gls";
+import { GlsConverter } from "../converters/glsConverter";
 import { IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";
 import { queueAsyncActions } from "../utils/asyncQueue";
@@ -55,11 +55,14 @@ export interface IRunDependencies {
     typescriptConfig?: string;
 }
 
-export interface IRunResults {
-    glsFiles: unknown;
+/**
+ * Results from converting a set of files.
+ */
+export interface IConversionResults {
+    /**
+     * Whether the results succeeded.
+     */
     status: ConversionStatus;
-
-    // GLS AST goes here?
 }
 
 /**
@@ -68,7 +71,7 @@ export interface IRunResults {
  * @param dependencies   Injected dependencies for converting files.
  * @returns Promise for converting the files.
  */
-export const convertFiles = async (dependencies: IRunDependencies): Promise<IRunResults> => {
+export const convertFiles = async (dependencies: IRunDependencies): Promise<IConversionResults> => {
     const failures: IFailedConversionResult[] = [];
     const successes: ISuccessfulConversionResult[] = [];
     const glsConverters = dependencies.languages.map((language) => new GlsConverter({
@@ -91,9 +94,8 @@ export const convertFiles = async (dependencies: IRunDependencies): Promise<IRun
     printActionsSummary(dependencies.logger, "Conversions", failures);
 
     return {
-        glsFiles: {},
         status: failures.length === 0
             ? ConversionStatus.Succeeded
-            : ConversionStatus.Failed
+            : ConversionStatus.Failed,
     };
 }

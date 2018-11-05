@@ -1,11 +1,12 @@
 import { EOL } from "os";
-import { createTransformer, Transformer } from "ts-gls";
+import { createTransformer, ITransformationResults, Transformer } from "ts-gls";
 import * as ts from "typescript";
 
 import { replaceFileExtension } from "../../utils/extensions";
 import { defaultValue } from "../../utils/values";
 import { ConversionStatus, IConversionResult, IConverter, ICreateConverterDependencies } from "../converter";
-import { glsExtension } from "../gls";
+import { glsExtension } from "../glsConverter";
+import { collectUnsupportedTransforms, IUnsupportedComplaint } from "./collectedUnsupportedTransforms";
 
 export interface ITsconfigOptions {
     compilerOptions: ts.CompilerOptions;
@@ -44,6 +45,17 @@ const createSourceFilesMap = (existingFileContents: Map<string, string>, scriptT
     });
 
     return map;
+};
+
+const complainForTransformation = (sourceFile: ts.SourceFile, complaint: IUnsupportedComplaint) => {
+    const { text } = sourceFile;
+    const { start } = complaint.range;
+    const line = text
+        .substring(0, start)
+        .split(/\r\n|\r|\n/g)
+        .length;
+
+    return `Line ${line + 1}: Unsupported syntax: ${(complaint.line.args[0])}`;
 };
 
 /**
@@ -92,16 +104,23 @@ export class TypeScriptConverter implements IConverter {
      * @returns The file's GLS output.
      */
     public async convertFile(sourcePath: string): Promise<IConversionResult> {
+        if (this.dependencies.metadata !== undefined && sourcePath === "src/index.ts") {
+            return {
+                sourcePath,
+                status: ConversionStatus.Succeeded,
+            }
+        }
+
         const sourceFile = this.sourceFiles.get(sourcePath);
         if (sourceFile === undefined) {
             throw new Error(`Unknown source file: '${sourcePath}'.`);
         }
 
         const outputPath = replaceFileExtension(sourcePath, tsExtension, glsExtension);
-        let converted: ReadonlyArray<string>;
+        let transformationResults: ITransformationResults;
 
         try {
-            converted = this.transformer.transformSourceFile(sourceFile);
+            transformationResults = this.transformer.transformSourceFile(sourceFile);
         } catch (error) {
             return {
                 error,
@@ -111,12 +130,25 @@ export class TypeScriptConverter implements IConverter {
             };
         }
 
-        await this.dependencies.fileSystem.writeFile(outputPath, converted.join(EOL));
+        await this.dependencies.fileSystem.writeFile(outputPath, transformationResults.printed.join(EOL));
 
-        return {
-            outputPath,
-            sourcePath,
-            status: ConversionStatus.Succeeded,
-        };
+        const unsupportedComplaints = collectUnsupportedTransforms(transformationResults.transforms);
+
+        return unsupportedComplaints.length === 0
+            ? {
+                outputPath,
+                sourcePath,
+                status: ConversionStatus.Succeeded,
+            }
+            : {
+                error: new Error(
+                    unsupportedComplaints
+                        .map((complaint) => complainForTransformation(sourceFile, complaint))
+                        .join("\n")
+                ),
+                outputPath,
+                sourcePath,
+                status: ConversionStatus.Failed,
+            };
     }
 }

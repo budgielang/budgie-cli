@@ -38,6 +38,19 @@ Input files to convert from GLS to the output language must have a `.gls` extens
             </td>
         </tr>
         <tr>
+            <th><code>-n</code>/<code>--namespace</code></th>
+            <td>
+                Namespace before path names, such as <code>"Gls"</code>.
+            </td>
+        </tr>
+        <tr>
+            <th><code>-p</code>/<code>--project</code></th>
+            <td>
+                Path to a <code>gls.json</code> project file to indicate to create project root-level exports and metadata files.
+                Will default to a <code>gls.json</code> file detected in the current directory if one exists and <code>-p</code>/<code>--project</code> is not provided as <code>false</code>.
+            </td>
+        </tr>
+        <tr>
             <th><code>-t</code>/<code>--tsconfig</code></th>
             <td>
                 TypeScript project configuration file.
@@ -91,10 +104,9 @@ When the CLI is called, the following code paths are used in order:
 
 1. `Cli`
 2. `Main`
-3. `Preprocess`
-4. `Runner`
-5. `Postprocess`
-6. `FileCoordinator`
+3. `Preprocessing`
+4. `Conversions`
+5. `Postprocessing`
 
 #### `Cli`
 
@@ -115,33 +127,35 @@ There are two real behaviors here not covered by the `Cli`:
 
 See [`main.ts`](./src/main.ts).
 
-#### `Preprocess`
+#### `Preprocessing`
 
-
-
-See [`preprocess.ts`](./src/conversions/preprocess.ts).
-
-#### `Runner`
-
-Launches a `Coordinator`-managed conversion for each file, then reports the conversion results.
-
-Uses an async queue to throttle the number of files that are attempted to be converted at once, as some conversions may need asynchronous operations.
-
-See [`runner.ts`](./src/runner/runner.ts) and [`runnerFactory.ts`](./src/runner/runnerFactory.ts`).
-
-##### `FileCoordinator`
-
-The driving class behind taking in files and outputting converted `.gls` files.
-Given a file passed to its `convertFile`, it will attempt to convert that file to a `.gls` file by:
-
-1. Preprocessing the file if the file extension requires it
-2. Converting the file using its `IConverter`
+If any files are passed in with native language extensions, namely `.ts` for TypeScript, they are converted here using that langauge's converter to their `.gls` equivalent.
 
 For example, if a `.ts` file is provided, it will attempt to convert it using [TS-GLS](https://github.com/general-language-syntax/ts-gls) and return the generated `.gls` file path.
 If a `.gls` file path is provided, it will do nothing and pass that path through.
 
-See [`fileCoordinator.ts`](./src/fileCoordinator.ts) and [`fileCoordinatorFactory.ts`](./src/coordinatorFactory).
+Any language-specific files that are used as metadata files for that language, such as `src/index.js` for JavaScript, will be removed from the files list.
+
+See [`preprocessFiles.ts`](./src/preprocessing/preprocessFiles.ts).
+
+#### `Conversions`
+
+Converts each `.gls` file to the output language(s).
+
+`convertFiles` uses an async queue to throttle the number of files that are attempted to be converted via `convertFile` at once, as some conversions may need asynchronous operations.
+Creates a `GlsConverter` per output language and has each file run through them.
+
+See [`convertFiles.ts`](./src/conversions/convertFiles.ts) and [`convertFile.ts`](./src/conversions/convertFile).
 
 #### `Postprocess`
 
-...
+Runs tasks on the converted `.gls` files as a project group after they've been successfully created.
+
+If a `.gls.json` is not provided or detected, this does nothing.
+Otherwise, it creates a root metadata file(s) as specified by each output language.
+These are typically one or both of:
+
+* Metadata file describing the output project.
+* Exports file exporting publicaly exportable objects for languages that need them.
+
+See [`postprocess.ts`](./src/postprocessing/postprocess.ts).

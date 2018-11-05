@@ -5,13 +5,17 @@ import { printActionsPrefix, printActionsSummary } from "../utils/printing";
 import { createLanguageMetadataFiles } from "./metadata";
 
 export interface IPostprocessDependencies {
-    glsFiles: unknown;
     fileSystem: IFileSystem;
     languages: ReadonlyArray<Language>;
     logger: ILogger;
+    project?: string;
 }
 
 export const postprocess = async (dependencies: IPostprocessDependencies): Promise<void> => {
+    if (dependencies.project === undefined) {
+        return;
+    }
+
     dependencies.logger.log();
     printActionsPrefix(dependencies.logger, dependencies.languages, "Postprocessing", "language");
 

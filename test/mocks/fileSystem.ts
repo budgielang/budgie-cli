@@ -1,4 +1,4 @@
-import { IFileSystem } from "../../lib/files";
+import { IFileSystem } from "../../lib/fileSystem";
 
 export interface IMockFiles {
     [i: string]: string;

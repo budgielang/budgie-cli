@@ -1,5 +1,6 @@
 import { IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";
+import { IGlsProjectMetadata } from "../postprocessing/metadata";
 
 /**
  * Status from a conversion attempt.
@@ -21,9 +22,9 @@ export enum ConversionStatus {
  */
 export interface IConversionResultBase {
     /**
-     * Would-be path to the output file.
+     * Would-be path to the output file, if one should be created.
      */
-    outputPath: string;
+    outputPath?: string;
 
     /**
      * Source path to the original file.
@@ -94,6 +95,11 @@ export interface ICreateConverterDependencies {
      * Reads and writes files.
      */
     fileSystem: IFileSystem;
+
+    /**
+     * GLS project schema metadata, if provided.
+     */
+    metadata?: IGlsProjectMetadata;
 
     /**
      * Logs information on significant events.

@@ -52,7 +52,6 @@
         "typescript": "^3.0.1"
     },
     "scripts": {
-        "precommit": "pretty-quick --staged --write",
         "prettier:write": "prettier --config .prettierrc.json --write",
         "prettier:write:all": "npm run prettier:write ./{src,test}/**/*.{json,ts}",
         "src": "npm run src:tsc && npm run src:tslint",
@@ -63,5 +62,10 @@
         "test:tslint": "tslint -c tslint.json -p test/tsconfig.json -t stylish",
         "test:run": "mocha test/*.js test/**/*.js",
         "verify": "npm run src && npm run test"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged --write"
+        }
     }
 }

@@ -22,7 +22,7 @@ describe("Runner", () => {
     describe("run", () => {
         it("converts a GLS file to C#", async () => {
             // Arrange
-            const inputFilePath = "file.gls";
+            const inputFilePath = "File.gls";
             const inputFileContents = "comment line : Hello world!";
             const { fileSystem, runner } = createTestRunner(["C#"], {
                 [inputFilePath]: inputFileContents,
@@ -38,13 +38,13 @@ describe("Runner", () => {
 
             // Assert
             expect(fileSystem.files).to.contain({
-                "file.cs": "// Hello world!",
+                "File.cs": "// Hello world!",
             });
         });
 
         it("converts a GLS file to multiple languages", async () => {
             // Arrange
-            const inputFilePath = "file.gls";
+            const inputFilePath = "File.gls";
             const inputFileContents = "comment line : Hello world!";
             const { fileSystem, runner } = createTestRunner(["C#", "Python"], {
                 [inputFilePath]: inputFileContents,
@@ -60,14 +60,14 @@ describe("Runner", () => {
 
             // Assert
             expect(fileSystem.files).to.contain({
-                "file.cs": "// Hello world!",
-                "file.py": "# Hello world!",
+                "File.cs": "// Hello world!",
+                "File.py": "# Hello world!",
             });
         });
 
         it("converts a TypeScript file to C#", async () => {
             // Arrange
-            const inputFilePath = "file.ts";
+            const inputFilePath = "Sample/File.ts";
             const inputFileContents = 'console.log("Hello world!");';
             const { fileSystem, runner } = createTestRunner(["C#"], {
                 [inputFilePath]: inputFileContents,
@@ -83,8 +83,8 @@ describe("Runner", () => {
 
             // Assert
             expect(fileSystem.files).to.contain({
-                "file.cs": ["using System;", "", 'Console.WriteLine("Hello world!");'].join(EOL),
-                "file.gls": 'print : ("Hello world!")',
+                "Sample/File.cs": ["using System;", "", "namespace Sample", "{", '    Console.WriteLine("Hello world!");', "}"].join(EOL),
+                "Sample/File.gls": ["file start : Sample File", '    print : ("Hello world!")', "file end"].join(EOL),
             });
         });
     });

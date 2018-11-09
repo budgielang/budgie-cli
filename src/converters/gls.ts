@@ -45,7 +45,7 @@ export class GlsConverter implements IConverter {
      * @param dependencies   Dependencies used for initialization.
      */
     public constructor(dependencies: IGlsConverterDependencies) {
-        this.gls = new Gls(dependencies.language.properties.general.name);
+        this.gls = new Gls(dependencies.language.general.name);
         this.dependencies = dependencies;
     }
 
@@ -56,7 +56,7 @@ export class GlsConverter implements IConverter {
      * @returns The file's language output.
      */
     public async convertFile(sourcePath: string): Promise<IConversionResult> {
-        const newExtension = this.dependencies.language.properties.general.extension;
+        const newExtension = this.dependencies.language.general.extension;
         const outputPath = replaceFileExtension(sourcePath, glsExtension, newExtension);
 
         try {

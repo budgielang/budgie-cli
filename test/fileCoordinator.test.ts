@@ -49,9 +49,9 @@ describe("FileCoordinator", () => {
 
         it("converts a TypeScript file to C#", async () => {
             // Arrange
-            const inputFilePath = "file.ts";
+            const inputFilePath = "Sample/file.ts";
             const inputFileContents = 'console.log("Hello world!");';
-            const outputFilePath = "file.cs";
+            const outputFilePath = "Sample/file.cs";
             const { coordinator, fileSystem } = createTestCoordinator("C#", {
                 [inputFilePath]: inputFileContents,
                 [stubTsconfigFileName]: "{}",
@@ -67,10 +67,12 @@ describe("FileCoordinator", () => {
             // Assert
             expect(result).to.be.deep.equal({
                 outputPath: outputFilePath,
-                sourcePath: "file.gls",
+                sourcePath: "Sample/file.gls",
                 status: ConversionStatus.Succeeded,
             });
-            expect(fileSystem.files[outputFilePath]).to.be.equal(["using System;", "", 'Console.WriteLine("Hello world!");'].join(EOL));
+            expect(fileSystem.files[outputFilePath]).to.be.equal(
+                ["using System;", "", "namespace Sample", "{", '    Console.WriteLine("Hello world!");', "}"].join(EOL),
+            );
         });
     });
 });

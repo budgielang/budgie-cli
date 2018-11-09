@@ -78,7 +78,7 @@ const readFilesFromSystem = async (filePaths: ReadonlySet<string>, fileSystem: I
 
 const getProjectMetadata = async (project: string | undefined, fileSystem: IFileSystem) => {
     if (project === undefined) {
-        return;
+        return undefined;
     }
 
     try {
@@ -140,7 +140,7 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
             return ExitCode.Error;
         }
 
-        // 0c: Create language preprocessor converters per known language type 
+        // 0c: Create language preprocessor converters per known language type
         const existingFileContents = await readFilesFromSystem(dependencies.filePaths, dependencies.fileSystem);
         const convertersBag = createConvertersBag({
             baseDirectory: dependencies.baseDirectory,
@@ -181,7 +181,7 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
             return ExitCode.Error;
         }
 
-        // 3: Create project metadata files (and soon exports) 
+        // 3: Create project metadata files (and soon exports)
         await postprocess({
             fileSystem: dependencies.fileSystem,
             languages,

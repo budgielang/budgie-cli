@@ -10,13 +10,7 @@
         "type": "git",
         "url": "git+https://github.com/highschoolhacking/gls-cli.git"
     },
-    "keywords": [
-        "general",
-        "language",
-        "syntax",
-        "gls",
-        "cli"
-    ],
+    "keywords": ["general", "language", "syntax", "gls", "cli"],
     "author": "Josh Goldberg <joshuakgoldberg@outlook.com>",
     "license": "MIT",
     "bugs": {
@@ -25,40 +19,39 @@
     "homepage": "https://github.com/highschoolhacking/gls-cli#readme",
     "dependencies": {
         "chalk": "^2.4.1",
-        "commander": "^2.17.1",
+        "commander": "^2.19.0",
         "glob": "^7.1.3",
         "minimatch": "^3.0.4",
         "mz": "^2.7.0"
     },
     "devDependencies": {
-        "@types/chai": "^4.1.4",
+        "@types/chai": "^4.1.7",
         "@types/chalk": "^2.2.0",
         "@types/commander": "^2.12.2",
-        "@types/glob": "^5.0.35",
+        "@types/glob": "^7.1.1",
         "@types/minimatch": "^3.0.3",
         "@types/mocha": "^5.2.5",
         "@types/mz": "0.0.32",
-        "@types/node": "^10.9.4",
-        "@types/sinon": "^5.0.2",
+        "@types/node": "^10.12.2",
+        "@types/sinon": "^5.0.5",
         "@types/sinon-chai": "^3.2.0",
-        "chai": "^4.1.2",
+        "chai": "^4.2.0",
         "del": "^3.0.0",
-        "husky": "^0.14.3",
+        "husky": "^1.1.3",
         "mocha": "^5.2.0",
-        "prettier": "^1.14.2",
-        "pretty-quick": "^1.6.0",
-        "sinon": "^6.1.5",
+        "prettier": "^1.14.3",
+        "pretty-quick": "^1.8.0",
+        "sinon": "^7.1.1",
         "sinon-chai": "^3.2.0",
         "tslint": "5.11.0",
         "tslint-config-prettier": "^1.15.0"
     },
     "peerDependencies": {
-        "general-language-syntax": "^0.3.22",
+        "general-language-syntax": "^0.3.25",
         "ts-gls": "^0.3.0",
         "typescript": "^3.0.1"
     },
     "scripts": {
-        "precommit": "pretty-quick --staged --write",
         "prettier:write": "prettier --config .prettierrc.json --write",
         "prettier:write:all": "npm run prettier:write ./{src,test}/**/*.{json,ts}",
         "src": "npm run src:tsc && npm run src:tslint",
@@ -69,5 +62,10 @@
         "test:tslint": "tslint -c tslint.json -p test/tsconfig.json -t stylish",
         "test:run": "mocha test/*.js test/**/*.js",
         "verify": "npm run src && npm run test"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "pretty-quick --staged --write"
+        }
     }
 }

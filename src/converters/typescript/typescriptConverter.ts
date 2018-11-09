@@ -1,12 +1,12 @@
 import { EOL } from "os";
-import { createTransformer, ITransformationResults, Transformer } from "ts-gls";
+import { createTransformer, Transformer } from "ts-gls";
 import * as ts from "typescript";
 
 import { replaceFileExtension } from "../../utils/extensions";
 import { defaultValue } from "../../utils/values";
 import { ConversionStatus, IConversionResult, IConverter, ICreateConverterDependencies } from "../converter";
 import { glsExtension } from "../glsConverter";
-import { collectUnsupportedTransforms, IUnsupportedComplaint } from "./collectedUnsupportedTransforms";
+import { IUnsupportedComplaint } from "./collectedUnsupportedTransforms";
 
 export interface ITsconfigOptions {
     compilerOptions: ts.CompilerOptions;
@@ -47,15 +47,15 @@ const createSourceFilesMap = (existingFileContents: Map<string, string>, scriptT
     return map;
 };
 
-const complainForTransformation = (sourceFile: ts.SourceFile, complaint: IUnsupportedComplaint) => {
+/**
+ * @todo Use this once ts-gls supports emitting a summary of unsupported syntax.
+ */
+export const complainForTransformation = (sourceFile: ts.SourceFile, complaint: IUnsupportedComplaint) => {
     const { text } = sourceFile;
     const { start } = complaint.range;
-    const line = text
-        .substring(0, start)
-        .split(/\r\n|\r|\n/g)
-        .length;
+    const line = text.substring(0, start).split(/\r\n|\r|\n/g).length;
 
-    return `Line ${line + 1}: Unsupported syntax: ${(complaint.line.args[0])}`;
+    return `Line ${line + 1}: Unsupported syntax: ${complaint.line.args[0]}`;
 };
 
 /**
@@ -108,7 +108,7 @@ export class TypeScriptConverter implements IConverter {
             return {
                 sourcePath,
                 status: ConversionStatus.Succeeded,
-            }
+            };
         }
 
         const sourceFile = this.sourceFiles.get(sourcePath);
@@ -117,7 +117,7 @@ export class TypeScriptConverter implements IConverter {
         }
 
         const outputPath = replaceFileExtension(sourcePath, tsExtension, glsExtension);
-        let transformationResults: ITransformationResults;
+        let transformationResults: string[];
 
         try {
             transformationResults = this.transformer.transformSourceFile(sourceFile);
@@ -130,25 +130,12 @@ export class TypeScriptConverter implements IConverter {
             };
         }
 
-        await this.dependencies.fileSystem.writeFile(outputPath, transformationResults.printed.join(EOL));
+        await this.dependencies.fileSystem.writeFile(outputPath, transformationResults.join(EOL));
 
-        const unsupportedComplaints = collectUnsupportedTransforms(transformationResults.transforms);
-
-        return unsupportedComplaints.length === 0
-            ? {
-                outputPath,
-                sourcePath,
-                status: ConversionStatus.Succeeded,
-            }
-            : {
-                error: new Error(
-                    unsupportedComplaints
-                        .map((complaint) => complainForTransformation(sourceFile, complaint))
-                        .join("\n")
-                ),
-                outputPath,
-                sourcePath,
-                status: ConversionStatus.Failed,
-            };
+        return {
+            outputPath,
+            sourcePath,
+            status: ConversionStatus.Succeeded,
+        };
     }
 }

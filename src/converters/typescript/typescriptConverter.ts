@@ -2,12 +2,11 @@ import { EOL } from "os";
 import { createTransformer, Transformer } from "ts-gls";
 import * as ts from "typescript";
 
-import { ConversionStatus, IConversionResult, IConverter } from "../../converter";
-import { IFileSystem } from "../../files";
-import { IRunOptions } from "../../runner/runner";
 import { replaceFileExtension } from "../../utils/extensions";
 import { defaultValue } from "../../utils/values";
-import { glsExtension } from "../gls";
+import { ConversionStatus, IConversionResult, IConverter, ICreateConverterDependencies } from "../converter";
+import { glsExtension } from "../glsConverter";
+import { IUnsupportedComplaint } from "./collectedUnsupportedTransforms";
 
 export interface ITsconfigOptions {
     compilerOptions: ts.CompilerOptions;
@@ -17,14 +16,14 @@ export interface ITsconfigOptions {
 }
 
 /**
+ * Extension for TypeScript files.
+ */
+export const tsExtension = ".ts";
+
+/**
  * Dependencies to initialize a new instance of the TypeScriptConverter class.
  */
-export interface ITypeScriptConverterDependencies {
-    /**
-     * Reads and writes files.
-     */
-    fileSystem: IFileSystem;
-
+export interface ITypeScriptConverterDependencies extends ICreateConverterDependencies {
     /**
      * Options for the TypeScript compiler.
      */
@@ -32,25 +31,31 @@ export interface ITypeScriptConverterDependencies {
 }
 
 /**
- * Extension for TypeScript files.
- */
-export const tsExtension = ".ts";
-
-/**
  * Creates TS source files for each file name.
  *
- * @param options   Options for converting files.
+ * @param existingFileContents   Writable cache of contents of file paths, keyed by unique file name.
  * @param scriptTarget   Specified TypeScript language output target.
  * @returns TypeScript source files, keyed by unique file path.
  */
-const createSourceFilesMap = (options: IRunOptions, scriptTarget: ts.ScriptTarget): Map<string, ts.SourceFile> => {
+const createSourceFilesMap = (existingFileContents: Map<string, string>, scriptTarget: ts.ScriptTarget): Map<string, ts.SourceFile> => {
     const map = new Map<string, ts.SourceFile>();
 
-    options.existingFileContents.forEach((fileContents: string, fileName: string) => {
+    existingFileContents.forEach((fileContents: string, fileName: string) => {
         map.set(fileName, ts.createSourceFile(fileName, fileContents, scriptTarget, true, ts.ScriptKind.TS));
     });
 
     return map;
+};
+
+/**
+ * @todo Use this once ts-gls supports emitting a summary of unsupported syntax.
+ */
+export const complainForTransformation = (sourceFile: ts.SourceFile, complaint: IUnsupportedComplaint) => {
+    const { text } = sourceFile;
+    const { start } = complaint.range;
+    const line = text.substring(0, start).split(/\r\n|\r|\n/g).length;
+
+    return `Line ${line + 1}: Unsupported syntax: ${complaint.line.args[0]}`;
 };
 
 /**
@@ -78,16 +83,16 @@ export class TypeScriptConverter implements IConverter {
      * @param dependencies   Dependencies used for initialization.
      * @param options   Options for converting files.
      */
-    public constructor(dependencies: ITypeScriptConverterDependencies, options: IRunOptions) {
+    public constructor(dependencies: ITypeScriptConverterDependencies) {
         this.dependencies = dependencies;
 
         this.sourceFiles = createSourceFilesMap(
-            options,
+            dependencies.existingFileContents,
             defaultValue(dependencies.tsconfigOptions.compilerOptions.target, () => ts.ScriptTarget.Latest),
         );
         this.transformer = createTransformer({
-            baseDirectory: options.baseDirectory,
-            outputNamespace: options.outputNamespace,
+            baseDirectory: dependencies.baseDirectory,
+            outputNamespace: dependencies.outputNamespace,
             sourceFiles: Array.from(this.sourceFiles.values()),
         });
     }
@@ -99,16 +104,23 @@ export class TypeScriptConverter implements IConverter {
      * @returns The file's GLS output.
      */
     public async convertFile(sourcePath: string): Promise<IConversionResult> {
+        if (this.dependencies.metadata !== undefined && sourcePath === "src/index.ts") {
+            return {
+                sourcePath,
+                status: ConversionStatus.Succeeded,
+            };
+        }
+
         const sourceFile = this.sourceFiles.get(sourcePath);
         if (sourceFile === undefined) {
             throw new Error(`Unknown source file: '${sourcePath}'.`);
         }
 
         const outputPath = replaceFileExtension(sourcePath, tsExtension, glsExtension);
-        let converted: ReadonlyArray<string>;
+        let transformationResults: string[];
 
         try {
-            converted = this.transformer.transformSourceFile(sourceFile);
+            transformationResults = this.transformer.transformSourceFile(sourceFile);
         } catch (error) {
             return {
                 error,
@@ -118,7 +130,7 @@ export class TypeScriptConverter implements IConverter {
             };
         }
 
-        await this.dependencies.fileSystem.writeFile(outputPath, converted.join(EOL));
+        await this.dependencies.fileSystem.writeFile(outputPath, transformationResults.join(EOL));
 
         return {
             outputPath,

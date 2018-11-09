@@ -1,15 +1,16 @@
 import chalk from "chalk";
 import { Language, LanguagesBag } from "general-language-syntax";
 
-import { IFileSystem } from "./files";
+import { ExitCode } from "./codes";
+import { convertFiles } from "./conversions/convertFiles";
+import { ConversionStatus } from "./converters/converter";
+import { createConvertersBag } from "./converters/convertersBag";
+import { IFileSystem } from "./fileSystem";
 import { ILogger } from "./logger";
-import { createRunner } from "./runner/runnerFactory";
+import { IGlsProjectMetadata } from "./postprocessing/metadata";
+import { postprocess } from "./postprocessing/postprocess";
+import { preprocessFiles } from "./preprocessing/preprocessFiles";
 import { queueAsyncActions } from "./utils/asyncQueue";
-
-export enum ExitCode {
-    Ok = 0,
-    Error = 1,
-}
 
 /**
  * Dependencies to set up and run a runner.
@@ -23,7 +24,7 @@ export interface IMainDependencies {
     /**
      * Unique file paths to convert.
      */
-    files: ReadonlySet<string>;
+    filePaths: ReadonlySet<string>;
 
     /**
      * Reads and writes files.
@@ -44,6 +45,11 @@ export interface IMainDependencies {
      * Namespace before path names, such as "Gls", if not "".
      */
     namespace?: string;
+
+    /**
+     * GLS configuration project, if provided.
+     */
+    project?: string;
 
     /**
      * TypeScript configuration project, if provided.
@@ -68,6 +74,18 @@ const readFilesFromSystem = async (filePaths: ReadonlySet<string>, fileSystem: I
     );
 
     return map;
+};
+
+const getProjectMetadata = async (project: string | undefined, fileSystem: IFileSystem) => {
+    if (project === undefined) {
+        return undefined;
+    }
+
+    try {
+        return JSON.parse(await fileSystem.readFile(project)) as IGlsProjectMetadata;
+    } catch (error) {
+        return error;
+    }
 };
 
 /**
@@ -109,24 +127,66 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
         return languages;
     };
 
-    const run = async (): Promise<number> => {
+    const run = async (): Promise<ExitCode> => {
+        // 0a: Retrieve corresponding GLS languages for -l/--language
         const languages = getLanguagesFromNames(dependencies.languageNames);
         if (languages === undefined) {
             return ExitCode.Error;
         }
 
-        const runner = createRunner({
+        // 0b: Read project metadata if a GLS project file is provided
+        const metadata = await getProjectMetadata(dependencies.project, dependencies.fileSystem);
+        if (metadata instanceof Error) {
+            return ExitCode.Error;
+        }
+
+        // 0c: Create language preprocessor converters per known language type
+        const existingFileContents = await readFilesFromSystem(dependencies.filePaths, dependencies.fileSystem);
+        const convertersBag = createConvertersBag({
+            baseDirectory: dependencies.baseDirectory,
+            existingFileContents,
+            fileSystem: dependencies.fileSystem,
+            logger: dependencies.logger,
+            metadata,
+            outputNamespace: dependencies.namespace,
+            typescriptConfig: dependencies.typescriptConfig,
+        });
+
+        // 1: Preprocess any known language types, such as .ts, to .gls files
+        const preprocessResult = await preprocessFiles({
+            convertersBag,
+            filePaths: dependencies.filePaths,
             fileSystem: dependencies.fileSystem,
             languages,
             logger: dependencies.logger,
         });
 
-        await runner.run({
+        if (preprocessResult.status === ConversionStatus.Failed) {
+            return ExitCode.Error;
+        }
+
+        // 2: Convert all .gls files to the output language
+        const conversionResults = await convertFiles({
             baseDirectory: dependencies.baseDirectory,
-            existingFileContents: await readFilesFromSystem(dependencies.files, dependencies.fileSystem),
+            existingFileContents,
+            fileSystem: dependencies.fileSystem,
+            glsFilePaths: preprocessResult.glsFilePaths,
+            languages,
+            logger: dependencies.logger,
             outputNamespace: dependencies.namespace,
-            requestedFiles: dependencies.files,
             typescriptConfig: dependencies.typescriptConfig,
+        });
+
+        if (conversionResults.status === ConversionStatus.Failed) {
+            return ExitCode.Error;
+        }
+
+        // 3: Create project metadata files (and soon exports)
+        await postprocess({
+            fileSystem: dependencies.fileSystem,
+            languages,
+            logger: dependencies.logger,
+            project: dependencies.project,
         });
 
         return ExitCode.Ok;
@@ -135,7 +195,7 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
     try {
         return await run();
     } catch (error) {
-        dependencies.logger.error(error.message);
+        dependencies.logger.error(error.stack);
         return ExitCode.Error;
     }
 };

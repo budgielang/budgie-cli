@@ -1,6 +1,6 @@
 import { stub } from "sinon";
 
-import { IFileSystem } from "../lib/files";
+import { IFileSystem } from "../lib/fileSystem";
 import { ILogger } from "../lib/logger";
 
 export const stubFileSystem = (): IFileSystem => ({
@@ -12,4 +12,4 @@ export const stubLogger = (): ILogger =>
     ({
         error: stub(),
         log: stub(),
-    } as any); // tslint:disable-line no-any
+    });

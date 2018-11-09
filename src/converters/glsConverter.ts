@@ -1,9 +1,9 @@
 import { Gls, Language } from "general-language-syntax";
 import { EOL } from "os";
 
-import { ConversionStatus, IConversionResult, IConverter } from "../converter";
-import { IFileSystem } from "../files";
+import { IFileSystem } from "../fileSystem";
 import { replaceFileExtension } from "../utils/extensions";
+import { ConversionStatus, IConversionResult, IConverter } from "./converter";
 
 /**
  * Dependencies to initialize a new instance of the GlsConverter class.

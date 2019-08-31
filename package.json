@@ -19,7 +19,7 @@
     "homepage": "https://github.com/highschoolhacking/gls-cli#readme",
     "dependencies": {
         "chalk": "^2.4.1",
-        "commander": "^2.19.0",
+        "commander": "^3.0.1",
         "glob": "^7.1.3",
         "minimatch": "^3.0.4",
         "mz": "^2.7.0"

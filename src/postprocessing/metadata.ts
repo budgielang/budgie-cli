@@ -1,6 +1,8 @@
 import chalk from "chalk";
 import { CaseStyleConverterBag, NameSplitter } from "general-language-syntax";
+
 import { insertIntoTemplate } from "../utils/templates";
+
 import { IPostprocessDependencies } from "./postprocess";
 
 export interface IGlsProjectMetadata {
@@ -66,11 +68,7 @@ export const createLanguageMetadataFiles = async (dependencies: IPostprocessDepe
             const fileContents = insertIntoTemplate(language.projects.metadataFiles[metadataFileNameRaw].join("\n"), metadata);
 
             await dependencies.fileSystem.writeFile(fileName, fileContents);
-            dependencies.logger.log([
-                language.general.name,
-                chalk.grey(": Created "),
-                chalk.green(fileName),
-            ].join(""));
+            dependencies.logger.log([language.general.name, chalk.grey(": Created "), chalk.green(fileName)].join(""));
         }
     }
 };

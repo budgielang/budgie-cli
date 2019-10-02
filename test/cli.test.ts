@@ -4,6 +4,7 @@ import "mocha";
 import { cli } from "../lib/cli/cli";
 import { ExitCode } from "../lib/codes";
 import { IMainDependencies } from "../lib/main";
+
 import { stubLogger } from "./stubs";
 
 interface IGlobExpansions {

@@ -1,6 +1,7 @@
 import { ConversionStatus, IFailedConversionResult, ISuccessfulConversionResult } from "../converters/converter";
 import { GlsConverter } from "../converters/glsConverter";
 import { printActionResult } from "../utils/printing";
+
 import { IRunDependencies } from "./convertFiles";
 
 /**
@@ -30,15 +31,13 @@ export const convertFile = async (
     glsConverters: GlsConverter[],
     filePath: string,
 ): Promise<IFileRunResults> => {
-    const results = await Promise.all(
-        glsConverters.map(async (glsConverter) => glsConverter.convertFile(filePath)),
-    );
+    const results = await Promise.all(glsConverters.map(async (glsConverter) => glsConverter.convertFile(filePath)));
     const failures: IFailedConversionResult[] = [];
     const successes: ISuccessfulConversionResult[] = [];
 
     for (const result of results) {
         printActionResult(dependencies.logger, filePath, "Converted", "converting", result);
-        
+
         if (result.status === ConversionStatus.Failed) {
             failures.push(result);
         } else {

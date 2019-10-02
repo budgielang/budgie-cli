@@ -1,10 +1,11 @@
 import { ConversionStatus, IConversionResult } from "../converters/converter";
 import { getFileExtension } from "../utils/extensions";
 import { printActionResult } from "../utils/printing";
+
 import { IPreprocessDependencies } from "./preprocessFiles";
 
 export const preprocessFile = async (dependencies: IPreprocessDependencies, filePath: string): Promise<IConversionResult> => {
-    const fileExtension = getFileExtension(filePath); 
+    const fileExtension = getFileExtension(filePath);
     const converter = await dependencies.convertersBag.get(fileExtension);
 
     if (converter instanceof Error) {
@@ -13,7 +14,7 @@ export const preprocessFile = async (dependencies: IPreprocessDependencies, file
             outputPath: filePath,
             sourcePath: filePath,
             status: ConversionStatus.Failed,
-        }
+        };
     }
 
     if (converter === undefined) {

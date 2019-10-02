@@ -6,6 +6,7 @@ import { IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";
 import { queueAsyncActions } from "../utils/asyncQueue";
 import { printActionsPrefix, printActionsSummary } from "../utils/printing";
+
 import { convertFile } from "./convertFile";
 
 /**
@@ -74,10 +75,13 @@ export interface IConversionResults {
 export const convertFiles = async (dependencies: IRunDependencies): Promise<IConversionResults> => {
     const failures: IFailedConversionResult[] = [];
     const successes: ISuccessfulConversionResult[] = [];
-    const glsConverters = dependencies.languages.map((language) => new GlsConverter({
-        fileSystem: dependencies.fileSystem,
-        language,
-    }));
+    const glsConverters = dependencies.languages.map(
+        (language) =>
+            new GlsConverter({
+                fileSystem: dependencies.fileSystem,
+                language,
+            }),
+    );
 
     dependencies.logger.log();
     printActionsPrefix(dependencies.logger, dependencies.glsFilePaths, "Converting", "file");
@@ -94,8 +98,6 @@ export const convertFiles = async (dependencies: IRunDependencies): Promise<ICon
     printActionsSummary(dependencies.logger, "Conversions", failures);
 
     return {
-        status: failures.length === 0
-            ? ConversionStatus.Succeeded
-            : ConversionStatus.Failed,
+        status: failures.length === 0 ? ConversionStatus.Succeeded : ConversionStatus.Failed,
     };
-}
+};

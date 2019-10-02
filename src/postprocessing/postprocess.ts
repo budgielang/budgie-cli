@@ -1,7 +1,9 @@
 import { Language } from "general-language-syntax";
+
 import { IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";
 import { printActionsPrefix, printActionsSummary } from "../utils/printing";
+
 import { createLanguageMetadataFiles } from "./metadata";
 
 export interface IPostprocessDependencies {

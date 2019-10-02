@@ -1,8 +1,8 @@
 import { expect, use } from "chai";
 import "mocha";
 import { stub } from "sinon";
-
 import * as sinonChai from "sinon-chai";
+
 import { queueAsyncActions } from "../../lib/utils/asyncQueue";
 
 use(sinonChai);

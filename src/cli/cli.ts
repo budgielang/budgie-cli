@@ -6,6 +6,7 @@ import { ILogger, parseVerbosity, wrapLoggerForVerbosity } from "../logger";
 import { IMain, main } from "../main";
 import { globAllAsync, IGlobAllAsync } from "../utils/glob";
 import { defaultValue } from "../utils/values";
+
 import { getExcludes } from "./exclude";
 import { printCliVersions } from "./version";
 
@@ -112,24 +113,21 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         .option("-t, --tsconfig [tsconfig]", "(TypeScript only) configuration project")
         .option("-v, --verbosity [verbosity]", `Minimum logged verbosity level: "error" (default) or "log"`)
         .option("-V, --version", "output the CLI and GLS version numbers")
-        .on(
-            "--help",
-            (): void => {
-                logger.log();
-                logger.log("  Basic GLS conversion:");
-                logger.log();
-                logger.log("    $ gls --language Python file.gls");
-                logger.log();
-                logger.log("  Converting a TypeScript project to GLS, then to Python and Ruby:");
-                logger.log();
-                logger.log("    $ gls --language Python --language Ruby --tsconfig ./tsconfig ./*.ts");
-                logger.log();
-                logger.log("  Converting a TypeScript project to GLS, then to C#, replacing the 'src' path with 'Gls':");
-                logger.log();
-                logger.log("    $ gls --base-directory src/ --language C# --namespace Gls --tsconfig ./tsconfig ./*.ts");
-                logger.log();
-            },
-        )
+        .on("--help", (): void => {
+            logger.log();
+            logger.log("  Basic GLS conversion:");
+            logger.log();
+            logger.log("    $ gls --language Python file.gls");
+            logger.log();
+            logger.log("  Converting a TypeScript project to GLS, then to Python and Ruby:");
+            logger.log();
+            logger.log("    $ gls --language Python --language Ruby --tsconfig ./tsconfig ./*.ts");
+            logger.log();
+            logger.log("  Converting a TypeScript project to GLS, then to C#, replacing the 'src' path with 'Gls':");
+            logger.log();
+            logger.log("    $ gls --base-directory src/ --language C# --namespace Gls --tsconfig ./tsconfig ./*.ts");
+            logger.log();
+        })
         .parse(argv as string[]) as IParsedArguments;
 
     if ({}.hasOwnProperty.call(command, "version")) {
@@ -149,15 +147,9 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         filePaths.delete(exclude);
     }
 
-    const languageNames = command.language !== undefined && typeof command.language === "string"
-        ? [command.language]
-        : command.language;
+    const languageNames = command.language !== undefined && typeof command.language === "string" ? [command.language] : command.language;
 
-    const project = command.project === "false"
-        ? undefined
-        : command.project === undefined
-            ? "gls.json"
-            : command.project;
+    const project = command.project === "false" ? undefined : command.project === undefined ? "gls.json" : command.project;
 
     const verbosity = parseVerbosity(command.verbosity);
     if (verbosity === undefined) {

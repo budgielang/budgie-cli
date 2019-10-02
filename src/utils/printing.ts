@@ -1,7 +1,9 @@
 import chalk from "chalk";
 import { EOL } from "os";
+
 import { ConversionStatus, IConversionResult, IFailedConversionResult } from "../converters/converter";
 import { ILogger } from "../logger";
+
 import { indent } from "./text";
 
 export const printActionsPrefix = (
@@ -10,19 +12,9 @@ export const printActionsPrefix = (
     descriptor: string,
     targetType: string,
 ) => {
-    const size = targets instanceof Set
-        ? targets.size
-        : (targets as ReadonlyArray<unknown>).length;
+    const size = targets instanceof Set ? targets.size : (targets as ReadonlyArray<unknown>).length;
 
-    logger.log([
-        `${descriptor} `,
-        size,
-        ` ${targetType}`,
-        size === 1
-            ? ""
-            : "s",
-        "..."
-    ].join(""));
+    logger.log([`${descriptor} `, size, ` ${targetType}`, size === 1 ? "" : "s", "..."].join(""));
 };
 
 export const printActionResult = (
@@ -44,12 +36,7 @@ export const printActionResult = (
     } else {
         logger.error(
             chalk.grey.italic(`Failed ${descriptorFailed}`),
-            [
-                chalk.red.bold(filePath),
-                chalk.grey.italic(":"),
-                EOL,
-                indent(chalk.italic.red(`${result.error.stack}`)),
-            ].join(""),
+            [chalk.red.bold(filePath), chalk.grey.italic(":"), EOL, indent(chalk.italic.red(`${result.error.stack}`))].join(""),
         );
     }
 };

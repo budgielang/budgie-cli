@@ -12,6 +12,6 @@ cli(dependencies)
         process.exitCode = exitCode;
     })
     .catch(function (error) {
-        console.error("Error in gls-cli: " + error);
+        console.error("Error in budgie-cli: " + error);
         process.exitCode = ExitCode.Error;
     });

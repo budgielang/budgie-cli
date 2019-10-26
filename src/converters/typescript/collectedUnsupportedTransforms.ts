@@ -1,14 +1,14 @@
-import { CommandNames } from "general-language-syntax";
-import { GlsLine, IRange, Transformation } from "ts-gls";
+import { CommandNames } from "budgie";
+import { BudgieLine, IRange, Transformation } from "ts-budgie";
 
 export interface IUnsupportedComplaint {
-    line: GlsLine;
+    line: BudgieLine;
     range: IRange;
 }
 
 const visitTransformation = (transformation: Transformation, complaints: IUnsupportedComplaint[]): void => {
     for (const output of transformation.output) {
-        if (output instanceof GlsLine) {
+        if (output instanceof BudgieLine) {
             if (output.command === CommandNames.Unsupported) {
                 complaints.push({
                     line: output,
@@ -26,7 +26,7 @@ const visitTransformations = (transformations: ReadonlyArray<Transformation>, co
     for (const transformation of transformations) {
         visitTransformation(transformation, complaints);
     }
-}
+};
 
 export const collectUnsupportedTransforms = (transformations: ReadonlyArray<Transformation>): ReadonlyArray<IUnsupportedComplaint> => {
     const complaints: IUnsupportedComplaint[] = [];

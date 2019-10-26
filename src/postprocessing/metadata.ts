@@ -1,11 +1,11 @@
+import { CaseStyleConverterBag, NameSplitter } from "budgie";
 import chalk from "chalk";
-import { CaseStyleConverterBag, NameSplitter } from "general-language-syntax";
 
 import { insertIntoTemplate } from "../utils/templates";
 
 import { IPostprocessDependencies } from "./postprocess";
 
-export interface IGlsProjectMetadata {
+export interface IBudgieProjectMetadata {
     /**
      * Name of the overall project author.
      */
@@ -48,7 +48,9 @@ export interface IGlsProjectMetadata {
 }
 
 export const createLanguageMetadataFiles = async (dependencies: IPostprocessDependencies) => {
-    const metadataRaw = JSON.parse(await dependencies.fileSystem.readFile("gls.json")) as IGlsProjectMetadata & { [i: string]: string };
+    const metadataRaw = JSON.parse(await dependencies.fileSystem.readFile("budgie.json")) as IBudgieProjectMetadata & {
+        [i: string]: string;
+    };
     const caseStyleConverter = new CaseStyleConverterBag();
     const nameSplitter = new NameSplitter();
 

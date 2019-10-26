@@ -1,7 +1,7 @@
-import { Language } from "general-language-syntax";
+import { Language } from "budgie";
 
+import { BudgieConverter } from "../converters/budgieConverter";
 import { ConversionStatus, IFailedConversionResult, ISuccessfulConversionResult } from "../converters/converter";
-import { GlsConverter } from "../converters/glsConverter";
 import { IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";
 import { queueAsyncActions } from "../utils/asyncQueue";
@@ -33,7 +33,7 @@ export interface IRunDependencies {
     /**
      * File paths requested to be converted.
      */
-    glsFilePaths: ReadonlySet<string>;
+    budgieFilePaths: ReadonlySet<string>;
 
     /**
      * Languages to output to.
@@ -46,7 +46,7 @@ export interface IRunDependencies {
     logger: ILogger;
 
     /**
-     * Namespace before path names, such as "Gls", if not "".
+     * Namespace before path names, such as "Budgie", if not "".
      */
     outputNamespace?: string;
 
@@ -75,20 +75,20 @@ export interface IConversionResults {
 export const convertFiles = async (dependencies: IRunDependencies): Promise<IConversionResults> => {
     const failures: IFailedConversionResult[] = [];
     const successes: ISuccessfulConversionResult[] = [];
-    const glsConverters = dependencies.languages.map(
+    const budgieConverters = dependencies.languages.map(
         (language) =>
-            new GlsConverter({
+            new BudgieConverter({
                 fileSystem: dependencies.fileSystem,
                 language,
             }),
     );
 
     dependencies.logger.log();
-    printActionsPrefix(dependencies.logger, dependencies.glsFilePaths, "Converting", "file");
+    printActionsPrefix(dependencies.logger, dependencies.budgieFilePaths, "Converting", "file");
 
     await queueAsyncActions(
-        Array.from(dependencies.glsFilePaths).map((fileName) => async () => {
-            const result = await convertFile(dependencies, glsConverters, fileName);
+        Array.from(dependencies.budgieFilePaths).map((fileName) => async () => {
+            const result = await convertFile(dependencies, budgieConverters, fileName);
 
             failures.push(...result.failures);
             successes.push(...result.successes);

@@ -1,4 +1,4 @@
-import { Language } from "general-language-syntax";
+import { Language } from "budgie";
 
 import { IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";

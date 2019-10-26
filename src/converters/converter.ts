@@ -1,6 +1,6 @@
 import { IFileSystem } from "../fileSystem";
 import { ILogger } from "../logger";
-import { IGlsProjectMetadata } from "../postprocessing/metadata";
+import { IBudgieProjectMetadata } from "../postprocessing/metadata";
 
 /**
  * Status from a conversion attempt.
@@ -97,9 +97,9 @@ export interface ICreateConverterDependencies {
     fileSystem: IFileSystem;
 
     /**
-     * GLS project schema metadata, if provided.
+     * Budgie project schema metadata, if provided.
      */
-    metadata?: IGlsProjectMetadata;
+    metadata?: IBudgieProjectMetadata;
 
     /**
      * Logs information on significant events.
@@ -107,7 +107,7 @@ export interface ICreateConverterDependencies {
     logger: ILogger;
 
     /**
-     * Namespace before path names, such as "Gls", if not "".
+     * Namespace before path names, such as "Budgie", if not "".
      */
     outputNamespace?: string;
 

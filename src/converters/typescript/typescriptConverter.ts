@@ -1,11 +1,11 @@
 import { EOL } from "os";
-import { createTransformer, Transformer } from "ts-gls";
+import { createTransformer, ITransformationResults, Transformer } from "ts-budgie";
 import * as ts from "typescript";
 
 import { replaceFileExtension } from "../../utils/extensions";
 import { defaultValue } from "../../utils/values";
+import { budgieExtension } from "../budgieConverter";
 import { ConversionStatus, IConversionResult, IConverter, ICreateConverterDependencies } from "../converter";
-import { glsExtension } from "../glsConverter";
 
 import { IUnsupportedComplaint } from "./collectedUnsupportedTransforms";
 
@@ -49,7 +49,7 @@ const createSourceFilesMap = (existingFileContents: Map<string, string>, scriptT
 };
 
 /**
- * @todo Use this once ts-gls supports emitting a summary of unsupported syntax.
+ * @todo Use this once ts-budgie supports emitting a summary of unsupported syntax.
  */
 export const complainForTransformation = (sourceFile: ts.SourceFile, complaint: IUnsupportedComplaint) => {
     const { text } = sourceFile;
@@ -60,7 +60,7 @@ export const complainForTransformation = (sourceFile: ts.SourceFile, complaint: 
 };
 
 /**
- * Converts TypeScript files to their GLS outputs.
+ * Converts TypeScript files to their Budgie outputs.
  */
 export class TypeScriptConverter implements IConverter {
     /**
@@ -74,7 +74,7 @@ export class TypeScriptConverter implements IConverter {
     private readonly sourceFiles: Map<string, ts.SourceFile>;
 
     /**
-     * Transforms TypeScript to GLS.
+     * Transforms TypeScript to Budgie.
      */
     private readonly transformer: Transformer;
 
@@ -99,10 +99,10 @@ export class TypeScriptConverter implements IConverter {
     }
 
     /**
-     * Converts a TypeScript file to its GLS output.
+     * Converts a TypeScript file to its Budgie output.
      *
-     * @param sourcePath   Original GLS file path.
-     * @returns The file's GLS output.
+     * @param sourcePath   Original Budgie file path.
+     * @returns The file's Budgie output.
      */
     public async convertFile(sourcePath: string): Promise<IConversionResult> {
         if (this.dependencies.metadata !== undefined && sourcePath === "src/index.ts") {
@@ -117,8 +117,8 @@ export class TypeScriptConverter implements IConverter {
             throw new Error(`Unknown source file: '${sourcePath}'.`);
         }
 
-        const outputPath = replaceFileExtension(sourcePath, tsExtension, glsExtension);
-        let transformationResults: string[];
+        const outputPath = replaceFileExtension(sourcePath, tsExtension, budgieExtension);
+        let transformationResults: ITransformationResults;
 
         try {
             transformationResults = this.transformer.transformSourceFile(sourceFile);
@@ -131,7 +131,7 @@ export class TypeScriptConverter implements IConverter {
             };
         }
 
-        await this.dependencies.fileSystem.writeFile(outputPath, transformationResults.join(EOL));
+        await this.dependencies.fileSystem.writeFile(outputPath, transformationResults.printed.join(EOL));
 
         return {
             outputPath,

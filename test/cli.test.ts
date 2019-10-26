@@ -31,7 +31,7 @@ describe("CLI", () => {
         globExpansions: IGlobExpansions,
         innerMain: (dependencies: IMainDependencies) => void,
     ) => {
-        const argv = ["node", "gls-cli", "--language", "Java", ...extraArgv];
+        const argv = ["node", "budgie-cli", "--language", "Java", ...extraArgv];
         const globber = stubGlobber(globExpansions);
         const logger = stubLogger();
         const main = async (mainArgs: IMainDependencies) => {
@@ -57,7 +57,7 @@ describe("CLI", () => {
     describe("files", () => {
         it("includes a provided file", async () => {
             // Arrange
-            const stubFileName = "file.gls";
+            const stubFileName = "file.bg";
             const dependencies = stubMainDependencies(
                 [stubFileName],
                 {
@@ -77,8 +77,8 @@ describe("CLI", () => {
 
         it("expands matches from a globber", async () => {
             // Arrange
-            const stubExpander = "*.gls";
-            const stubFileNames = ["a.gls", "b.gls"];
+            const stubExpander = "*.bg";
+            const stubFileNames = ["a.bg", "b.bg"];
             const dependencies = stubMainDependencies(
                 [stubExpander],
                 {
@@ -98,8 +98,8 @@ describe("CLI", () => {
 
         it("removes an exclude from included files", async () => {
             // Arrange
-            const stubExpander = "*.gls";
-            const stubFileNames = ["a.gls", "b.gls"];
+            const stubExpander = "*.bg";
+            const stubFileNames = ["a.bg", "b.bg"];
             const dependencies = stubMainDependencies(
                 [stubExpander, "--exclude", stubFileNames[0]],
                 {

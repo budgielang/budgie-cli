@@ -1,5 +1,5 @@
+import { Language, LanguagesBag } from "budgie";
 import chalk from "chalk";
-import { Language, LanguagesBag } from "general-language-syntax";
 
 import { ExitCode } from "./codes";
 import { convertFiles } from "./conversions/convertFiles";
@@ -7,7 +7,7 @@ import { ConversionStatus } from "./converters/converter";
 import { createConvertersBag } from "./converters/convertersBag";
 import { IFileSystem } from "./fileSystem";
 import { ILogger } from "./logger";
-import { IGlsProjectMetadata } from "./postprocessing/metadata";
+import { IBudgieProjectMetadata } from "./postprocessing/metadata";
 import { postprocess } from "./postprocessing/postprocess";
 import { preprocessFiles } from "./preprocessing/preprocessFiles";
 import { queueAsyncActions } from "./utils/asyncQueue";
@@ -42,12 +42,12 @@ export interface IMainDependencies {
     logger: ILogger;
 
     /**
-     * Namespace before path names, such as "Gls", if not "".
+     * Namespace before path names, such as "Budgie", if not "".
      */
     namespace?: string;
 
     /**
-     * GLS configuration project, if provided.
+     * Budgie configuration project, if provided.
      */
     project?: string;
 
@@ -82,14 +82,14 @@ const getProjectMetadata = async (project: string | undefined, fileSystem: IFile
     }
 
     try {
-        return JSON.parse(await fileSystem.readFile(project)) as IGlsProjectMetadata;
+        return JSON.parse(await fileSystem.readFile(project)) as IBudgieProjectMetadata;
     } catch (error) {
         return error;
     }
 };
 
 /**
- * Validates GLS settings, sets up a conversion runner, and runs it.
+ * Validates Budgie settings, sets up a conversion runner, and runs it.
  *
  * @param dependencies   Dependencies to set up and run a runner.
  */
@@ -128,13 +128,13 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
     };
 
     const run = async (): Promise<ExitCode> => {
-        // 0a: Retrieve corresponding GLS languages for -l/--language
+        // 0a: Retrieve corresponding Budgie languages for -l/--language
         const languages = getLanguagesFromNames(dependencies.languageNames);
         if (languages === undefined) {
             return ExitCode.Error;
         }
 
-        // 0b: Read project metadata if a GLS project file is provided
+        // 0b: Read project metadata if a Budgie project file is provided
         const metadata = await getProjectMetadata(dependencies.project, dependencies.fileSystem);
         if (metadata instanceof Error) {
             return ExitCode.Error;
@@ -152,7 +152,7 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
             typescriptConfig: dependencies.typescriptConfig,
         });
 
-        // 1: Preprocess any known language types, such as .ts, to .gls files
+        // 1: Preprocess any known language types, such as .ts, to .bg files
         const preprocessResult = await preprocessFiles({
             convertersBag,
             filePaths: dependencies.filePaths,
@@ -165,12 +165,12 @@ export const main = async (dependencies: IMainDependencies): Promise<ExitCode> =
             return ExitCode.Error;
         }
 
-        // 2: Convert all .gls files to the output language
+        // 2: Convert all .bg files to the output language
         const conversionResults = await convertFiles({
             baseDirectory: dependencies.baseDirectory,
+            budgieFilePaths: preprocessResult.budgieFilePaths,
             existingFileContents,
             fileSystem: dependencies.fileSystem,
-            glsFilePaths: preprocessResult.glsFilePaths,
             languages,
             logger: dependencies.logger,
             outputNamespace: dependencies.namespace,

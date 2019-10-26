@@ -65,12 +65,12 @@ interface IParsedArguments {
     language?: string | ReadonlyArray<string>;
 
     /**
-     * GLS configuration project, if provided.
+     * Budgie configuration project, if provided.
      */
     project?: string;
 
     /**
-     * Namespace before path names, such as "Gls", if not "".
+     * Namespace before path names, such as "Budgie", if not "".
      */
     namespace?: string;
 
@@ -108,24 +108,24 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
         .option("-b, --base-directory [base-directory]", "base directory to ignore from the beginning of file paths")
         .option("-e, --exclude [exclude...]", "file glob(s) to exclude")
         .option("-l, --language [language...]", "language(s) to convert to")
-        .option("-l, --project [project]", "gls.json project metadata file")
+        .option("-l, --project [project]", "budgie.json project metadata file")
         .option("-n, --namespace [namespace]", "namespace before output path names")
         .option("-t, --tsconfig [tsconfig]", "(TypeScript only) configuration project")
         .option("-v, --verbosity [verbosity]", `Minimum logged verbosity level: "error" (default) or "log"`)
-        .option("-V, --version", "output the CLI and GLS version numbers")
+        .option("-V, --version", "output the CLI and Budgie version numbers")
         .on("--help", (): void => {
             logger.log();
-            logger.log("  Basic GLS conversion:");
+            logger.log("  Basic Budgie conversion:");
             logger.log();
-            logger.log("    $ gls --language Python file.gls");
+            logger.log("    $ budgie --language Python file.bg");
             logger.log();
-            logger.log("  Converting a TypeScript project to GLS, then to Python and Ruby:");
+            logger.log("  Converting a TypeScript project to Budgie, then to Python and Ruby:");
             logger.log();
-            logger.log("    $ gls --language Python --language Ruby --tsconfig ./tsconfig ./*.ts");
+            logger.log("    $ budgie --language Python --language Ruby --tsconfig ./tsconfig ./*.ts");
             logger.log();
-            logger.log("  Converting a TypeScript project to GLS, then to C#, replacing the 'src' path with 'Gls':");
+            logger.log("  Converting a TypeScript project to Budgie, then to C#, replacing the 'src' path with 'Budgie':");
             logger.log();
-            logger.log("    $ gls --base-directory src/ --language C# --namespace Gls --tsconfig ./tsconfig ./*.ts");
+            logger.log("    $ budgie --base-directory src/ --language C# --namespace Budgie --tsconfig ./tsconfig ./**/*.ts");
             logger.log();
         })
         .parse(argv as string[]) as IParsedArguments;
@@ -149,7 +149,7 @@ export const cli = async (dependencies: ICliDependencies): Promise<ExitCode> => 
 
     const languageNames = command.language !== undefined && typeof command.language === "string" ? [command.language] : command.language;
 
-    const project = command.project === "false" ? undefined : command.project === undefined ? "gls.json" : command.project;
+    const project = command.project === "false" ? undefined : command.project === undefined ? "budgie.json" : command.project;
 
     const verbosity = parseVerbosity(command.verbosity);
     if (verbosity === undefined) {

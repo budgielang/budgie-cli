@@ -1,28 +1,31 @@
 {
-    "name": "gls-cli",
-    "version": "0.2.0",
-    "description": "Node CLI for General Language Syntax (GLS).",
+    "name": "budgie-cli",
+    "version": "0.3.0",
+    "description": "Node CLI for Budgie.",
     "main": "lib/index.js",
     "bin": {
-        "gls": "bin/gls"
+        "budgie": "bin/budgie"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/highschoolhacking/gls-cli.git"
+        "url": "git+https://github.com/highschoolhacking/budgie-cli.git"
     },
-    "keywords": ["general", "language", "syntax", "gls", "cli"],
+    "keywords": ["general", "language", "syntax", "budgie", "cli"],
     "author": "Josh Goldberg <joshuakgoldberg@outlook.com>",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/highschoolhacking/gls-cli/issues"
+        "url": "https://github.com/highschoolhacking/budgie-cli/issues"
     },
-    "homepage": "https://github.com/highschoolhacking/gls-cli#readme",
+    "homepage": "https://github.com/highschoolhacking/budgie-cli#readme",
     "dependencies": {
+        "budgie": "0.3.27",
         "chalk": "^2.4.2",
         "commander": "^3.0.2",
         "glob": "^7.1.5",
         "minimatch": "^3.0.4",
-        "mz": "^2.7.0"
+        "mz": "^2.7.0",
+        "ts-budgie": "latest",
+        "typescript": "latest"
     },
     "devDependencies": {
         "@types/chai": "^4.2.4",
@@ -45,11 +48,6 @@
         "sinon-chai": "^3.3.0",
         "tslint": "5.20.0",
         "tslint-config-prettier": "^1.18.0"
-    },
-    "peerDependencies": {
-        "general-language-syntax": "^0.3.25",
-        "ts-gls": "^0.3.1",
-        "typescript": "^3.6.4"
     },
     "scripts": {
         "prettier:write": "prettier --config .prettierrc.json --write",

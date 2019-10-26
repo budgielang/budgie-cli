@@ -1,5 +1,5 @@
+import { BudgieConverter } from "../converters/budgieConverter";
 import { ConversionStatus, IFailedConversionResult, ISuccessfulConversionResult } from "../converters/converter";
-import { GlsConverter } from "../converters/glsConverter";
 import { printActionResult } from "../utils/printing";
 
 import { IRunDependencies } from "./convertFiles";
@@ -28,10 +28,10 @@ interface IFileRunResults {
  */
 export const convertFile = async (
     dependencies: IRunDependencies,
-    glsConverters: GlsConverter[],
+    budgieConverters: BudgieConverter[],
     filePath: string,
 ): Promise<IFileRunResults> => {
-    const results = await Promise.all(glsConverters.map(async (glsConverter) => glsConverter.convertFile(filePath)));
+    const results = await Promise.all(budgieConverters.map(async (budgieConverter) => budgieConverter.convertFile(filePath)));
     const failures: IFailedConversionResult[] = [];
     const successes: ISuccessfulConversionResult[] = [];
 

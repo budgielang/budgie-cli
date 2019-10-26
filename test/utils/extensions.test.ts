@@ -5,15 +5,15 @@ import { getFileExtension, replaceFileExtension } from "../../lib/utils/extensio
 
 describe("extensions", () => {
     describe("getFileExtension", () => {
-        it("gets a .gls extension", () => {
+        it("gets a .bg extension", () => {
             // Arrange
-            const filePath = "file.gls";
+            const filePath = "file.bg";
 
             // Act
             const extension = getFileExtension(filePath);
 
             // Assert
-            expect(extension).to.be.equal(".gls");
+            expect(extension).to.be.equal(".bg");
         });
 
         it("gets a .ts extension", () => {
@@ -29,26 +29,26 @@ describe("extensions", () => {
     });
 
     describe("replaceFileExtension", () => {
-        it("replaces a .gls extension with a .ts extension", () => {
+        it("replaces a .bg extension with a .ts extension", () => {
             // Arrange
-            const filePath = "file.gls";
+            const filePath = "file.bg";
 
             // Act
-            const newFilePath = replaceFileExtension(filePath, ".gls", ".ts");
+            const newFilePath = replaceFileExtension(filePath, ".bg", ".ts");
 
             // Assert
             expect(newFilePath).to.be.equal("file.ts");
         });
 
-        it("replaces a .ts extension with a .gls extension", () => {
+        it("replaces a .ts extension with a .bg extension", () => {
             // Arrange
             const filePath = "file.ts";
 
             // Act
-            const newFilePath = replaceFileExtension(filePath, ".ts", ".gls");
+            const newFilePath = replaceFileExtension(filePath, ".ts", ".bg");
 
             // Assert
-            expect(newFilePath).to.be.equal("file.gls");
+            expect(newFilePath).to.be.equal("file.bg");
         });
     });
 });

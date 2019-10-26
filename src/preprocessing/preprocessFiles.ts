@@ -1,4 +1,4 @@
-import { Language } from "general-language-syntax";
+import { Language } from "budgie";
 
 import { ConversionStatus, IFailedConversionResult } from "../converters/converter";
 import { ConvertersBag } from "../converters/convertersBag";
@@ -17,7 +17,7 @@ export interface IPreprocessDependencies {
 }
 
 export interface IPreprocessResults {
-    glsFilePaths: ReadonlySet<string>;
+    budgieFilePaths: ReadonlySet<string>;
     status: ConversionStatus;
 }
 
@@ -35,14 +35,14 @@ const collectFilesToPreprocess = (filePaths: ReadonlySet<string>, languages: Rea
 export const preprocessFiles = async (dependencies: IPreprocessDependencies): Promise<IPreprocessResults> => {
     dependencies.logger.log("Preprocessing...");
 
-    const glsFilePaths = new Set<string>();
+    const budgieFilePaths = new Set<string>();
     const failures: IFailedConversionResult[] = [];
 
     for (const filePath of collectFilesToPreprocess(dependencies.filePaths, dependencies.languages)) {
         const conversion = await preprocessFile(dependencies, filePath);
 
         if (conversion.outputPath !== undefined) {
-            glsFilePaths.add(conversion.outputPath);
+            budgieFilePaths.add(conversion.outputPath);
         }
 
         if (conversion.status === ConversionStatus.Failed) {
@@ -53,7 +53,7 @@ export const preprocessFiles = async (dependencies: IPreprocessDependencies): Pr
     printActionsSummary(dependencies.logger, "Preprocessing", failures);
 
     return {
-        glsFilePaths,
+        budgieFilePaths,
         status: failures.length === 0 ? ConversionStatus.Succeeded : ConversionStatus.Failed,
     };
 };

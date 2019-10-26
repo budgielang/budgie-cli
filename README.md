@@ -1,23 +1,23 @@
-# `gls-cli`
+# `budgie-cli` 🦜
 
-[![Build Status](https://travis-ci.org/general-language-syntax/gls-cli.svg?)](https://travis-ci.org/general-language-syntax/gls-cli)
-[![NPM version](https://badge.fury.io/js/gls-cli.svg)](http://badge.fury.io/js/gls-cli)
+[![Build Status](https://travis-ci.org/budgielang/budgie-cli.svg?)](https://travis-ci.org/budgielang/budgie-cli)
+[![NPM version](https://badge.fury.io/js/budgie-cli.svg)](http://badge.fury.io/js/budgie-cli)
 
-Node CLI for [General Language Syntax (GLS)](https://github.com/general-language-syntax/GLS).
+Node CLI for [General Language Syntax (Budgie)](https://github.com/budgielang/Budgie).
 
 ## Usage
 
 ```cmd
-npm install general-language-syntax gls-cli ts-gls typescript gls-cli --global
+npm install budgie-cli --global
 
-gls --help
+budgie --help
 ```
 
 Pass any number of filenames and/or globs _(matched with [glob](http://npmjs.com/package/glob))_ to the CLI to convert those files to an output `-l`/`--language`.
 
-Input files to convert from GLS to the output language must have a `.gls` extension.
+Input files to convert from Budgie to the output language must have a `.bg` extension.
 
-`.ts` files may also be given with `-t`/`--tsconfig` to compile to `.gls` files before output language conversion.
+`.ts` files may also be given with `-t`/`--tsconfig` to compile to `.bg` files before output language conversion.
 
 <table>
     <thead>
@@ -40,14 +40,14 @@ Input files to convert from GLS to the output language must have a `.gls` extens
         <tr>
             <th><code>-n</code>/<code>--namespace</code></th>
             <td>
-                Namespace before path names, such as <code>"Gls"</code>.
+                Namespace before path names, such as <code>"Budgie"</code>.
             </td>
         </tr>
         <tr>
             <th><code>-p</code>/<code>--project</code></th>
             <td>
-                Path to a <code>gls.json</code> project file to indicate to create project root-level exports and metadata files.
-                Will default to a <code>gls.json</code> file detected in the current directory if one exists and <code>-p</code>/<code>--project</code> is not provided as <code>false</code>.
+                Path to a <code>budgie.json</code> project file to indicate to create project root-level exports and metadata files.
+                Will default to a <code>budgie.json</code> file detected in the current directory if one exists and <code>-p</code>/<code>--project</code> is not provided as <code>false</code>.
             </td>
         </tr>
         <tr>
@@ -59,23 +59,23 @@ Input files to convert from GLS to the output language must have a `.gls` extens
         </tr>
         <tr>
             <th><code>-v</code>/<code>--version</code></th>
-            <td>Prints the GLS, GLS-CLI, and TS-GLS versions.</td>
+            <td>Prints the Budgie, budgie-cli, and TS-Budgie versions.</td>
         </tr>
     </tbody>
 </table>
 
 ### Example Usage
 
-To convert `file.gls` to `file.py`:
+To convert `file.bg` to `file.py`:
 
 ```cmd
-gls --language Python file.gls
+budgie --language Python file.bg
 ```
 
-To convert `*.ts` to `*.gls`, then to `*.java`:
+To convert `*.ts` to `*.bg`, then to `*.java`:
 
 ```cmd
-gls --language Java --tsconfig ./tsconfig *.ts
+budgie --language Java --tsconfig ./tsconfig *.ts
 ```
 
 _Requires Node >=8_
@@ -86,7 +86,7 @@ To build from scratch, install Node.js and run the following commands:
 
 ```
 npm install
-npm install general-language-syntax ts-gls typescript --no-save
+npm install budgielang ts-budgie typescript --no-save
 npm run verify
 ```
 
@@ -119,20 +119,20 @@ See [`cli.ts`](./src/cli/cli.ts).
 
 #### `Main`
 
-Validates GLS settings, sets up the conversion's `Preprocess`, `Runner`, and `Postprocess`, then runs them in that order.
+Validates Budgie settings, sets up the conversion's `Preprocess`, `Runner`, and `Postprocess`, then runs them in that order.
 There are two real behaviors here not covered by the `Cli`:
 
 * Globbing file paths passed as glob args and reading them the file system.
-* Validating the provided language is known by GLS.
+* Validating the provided language is known by Budgie.
 
 See [`main.ts`](./src/main.ts).
 
 #### `Preprocessing`
 
-If any files are passed in with native language extensions, namely `.ts` for TypeScript, they are converted here using that langauge's converter to their `.gls` equivalent.
+If any files are passed in with native language extensions, namely `.ts` for TypeScript, they are converted here using that langauge's converter to their `.bg` equivalent.
 
-For example, if a `.ts` file is provided, it will attempt to convert it using [TS-GLS](https://github.com/general-language-syntax/ts-gls) and return the generated `.gls` file path.
-If a `.gls` file path is provided, it will do nothing and pass that path through.
+For example, if a `.ts` file is provided, it will attempt to convert it using [TS-Budgie](https://github.com/budgielang/ts-budgie) and return the generated `.bg` file path.
+If a `.bg` file path is provided, it will do nothing and pass that path through.
 
 Any language-specific files that are used as metadata files for that language, such as `src/index.js` for JavaScript, will be removed from the files list.
 
@@ -140,18 +140,18 @@ See [`preprocessFiles.ts`](./src/preprocessing/preprocessFiles.ts).
 
 #### `Conversions`
 
-Converts each `.gls` file to the output language(s).
+Converts each `.bg` file to the output language(s).
 
 `convertFiles` uses an async queue to throttle the number of files that are attempted to be converted via `convertFile` at once, as some conversions may need asynchronous operations.
-Creates a `GlsConverter` per output language and has each file run through them.
+Creates a `BudgieConverter` per output language and has each file run through them.
 
 See [`convertFiles.ts`](./src/conversions/convertFiles.ts) and [`convertFile.ts`](./src/conversions/convertFile).
 
 #### `Postprocess`
 
-Runs tasks on the converted `.gls` files as a project group after they've been successfully created.
+Runs tasks on the converted `.bg` files as a project group after they've been successfully created.
 
-If a `.gls.json` is not provided or detected, this does nothing.
+If a `.budgie.json` is not provided or detected, this does nothing.
 Otherwise, it creates a root metadata file(s) as specified by each output language.
 These are typically one or both of:
 

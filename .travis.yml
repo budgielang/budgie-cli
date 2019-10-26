@@ -4,7 +4,7 @@ before_install: npm i -g greenkeeper-lockfile npm@latest
 
 before_script: greenkeeper-lockfile-update
 
-install: npm i && npm i general-language-syntax ts-gls typescript --no-save
+install: npm i && npm i budgie ts-budgie typescript --no-save
 
 language: node_js
 
